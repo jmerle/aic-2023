@@ -4,6 +4,7 @@ import aic2023.user.Direction;
 import aic2023.user.GameConstants;
 import aic2023.user.Location;
 import aic2023.user.UnitController;
+import aic2023.user.UnitInfo;
 import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
 
@@ -43,9 +44,22 @@ public class HQ extends Unit {
             sortedRecruitDirections = true;
         }
 
+        boolean danger = false;
+        for (UnitInfo unit : uc.senseUnits(me.getStat(UnitStat.VISION_RANGE), opponentTeam)) {
+            if (unit.getType() == UnitType.BATTER) {
+                danger = true;
+                break;
+            }
+        }
+
         boolean didSomething = true;
         while (didSomething) {
             didSomething = false;
+
+            if (danger) {
+                didSomething = tryRecruit(UnitType.BATTER);
+                continue;
+            }
 
             UnitType type = recruitBatter ? UnitType.BATTER : UnitType.PITCHER;
             if (tryRecruit(type)) {

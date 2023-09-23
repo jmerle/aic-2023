@@ -22,11 +22,6 @@ public class HQ extends Unit {
         while (didSomething) {
             didSomething = false;
 
-            if (uc.getRound() < 100 && tryRecruit(UnitType.PITCHER)) {
-                didSomething = true;
-                continue;
-            }
-
             if (preferCooldown == 0) {
                 preferBatter = !preferBatter;
                 preferCooldown = 10;

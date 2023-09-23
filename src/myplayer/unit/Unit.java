@@ -176,14 +176,14 @@ public abstract class Unit {
             for (ExploredObject object : sharedArray.getExploredBases()) {
                 Location reflected = currentSymmetry.reflect(object.location);
                 if (!exploredTiles.isExplored(reflected)) {
-                    sharedArray.setExploredBase(object.location, sharedArray.OCCUPATION_EMPTY);
+                    sharedArray.setExploredBase(reflected, sharedArray.OCCUPATION_EMPTY);
                 }
             }
 
             for (ExploredObject object : sharedArray.getExploredStadiums()) {
                 Location reflected = currentSymmetry.reflect(object.location);
                 if (!exploredTiles.isExplored(reflected)) {
-                    sharedArray.setExploredStadium(object.location, sharedArray.OCCUPATION_EMPTY);
+                    sharedArray.setExploredStadium(reflected, sharedArray.OCCUPATION_EMPTY);
                 }
             }
         }

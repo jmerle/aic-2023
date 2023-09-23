@@ -40,7 +40,7 @@ public class UnitPlayer {
 
         int usedBytecodes = startRound == endRound
             ? endBytecodes - startBytecodes
-            : (maxBytecodes - startBytecodes) + Math.max(0, endRound - startBytecodes - 1) * maxBytecodes + endBytecodes;
+            : (maxBytecodes - startBytecodes) + Math.max(0, endRound - startRound - 1) * maxBytecodes + endBytecodes;
 
         double bytecodePercentage = (double) usedBytecodes / (double) maxBytecodes * 100.0;
         if (bytecodePercentage > 95) {

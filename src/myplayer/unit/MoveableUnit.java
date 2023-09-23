@@ -7,12 +7,17 @@ import aic2023.user.UnitController;
 import aic2023.user.UnitInfo;
 import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
+import myplayer.symmetry.HorizontalSymmetry;
+import myplayer.symmetry.RotationalSymmetry;
+import myplayer.symmetry.Symmetry;
+import myplayer.symmetry.VerticalSymmetry;
 import myplayer.util.ExploredTiles;
 import myplayer.util.RandomUtils;
 
-public abstract class MoveableUnit extends Unit {
-    protected Location myHQ;
+import java.util.ArrayList;
+import java.util.List;
 
+public abstract class MoveableUnit extends Unit {
     private Location currentTarget;
     private boolean isWallFollowing;
     private int distanceBeforeWallFollowing;
@@ -28,15 +33,6 @@ public abstract class MoveableUnit extends Unit {
     @Override
     public void run() {
         super.run();
-
-        if (myHQ == null) {
-            for (UnitInfo unit : uc.senseUnits(me.getStat(UnitStat.VISION_RANGE), myTeam)) {
-                if (unit.getType() == UnitType.HQ) {
-                    myHQ = unit.getLocation();
-                    break;
-                }
-            }
-        }
     }
 
     protected void explore() {
@@ -46,7 +42,9 @@ public abstract class MoveableUnit extends Unit {
         boolean hasMaxY = sharedArray.hasMaxY();
 
         if (!hasMinX || !hasMaxX || !hasMinY || !hasMaxY) {
-            exploreBoundaries();
+            findBoundaries();
+            return;
+        } else if (sharedArray.getOpponentHQ() == null && findOpponentHQ()) {
             return;
         }
 
@@ -77,36 +75,63 @@ public abstract class MoveableUnit extends Unit {
         tryMoveTo(explorationTarget);
     }
 
-    private void exploreBoundaries() {
+    private void findBoundaries() {
         boolean hasMinX = sharedArray.hasMinX();
         boolean hasMaxX = sharedArray.hasMaxX();
         boolean hasMinY = sharedArray.hasMinY();
         boolean hasMaxY = sharedArray.hasMaxY();
 
-        Direction exploreDirection = null;
+        Direction direction = null;
         if (!hasMinX) {
-            exploreDirection = Direction.WEST;
+            direction = Direction.WEST;
         } else if (!hasMaxX) {
-            exploreDirection = Direction.EAST;
+            direction = Direction.EAST;
         } else if (!hasMinY) {
-            exploreDirection = Direction.SOUTH;
+            direction = Direction.SOUTH;
         } else if (!hasMaxY) {
-            exploreDirection = Direction.NORTH;
+            direction = Direction.NORTH;
         }
 
         if (uc.getInfo().getID() % 2 == 0) {
             if (!hasMinX && !hasMinY) {
-                exploreDirection = Direction.SOUTHWEST;
+                direction = Direction.SOUTHWEST;
             } else if (!hasMinX && !hasMaxY) {
-                exploreDirection = Direction.NORTHWEST;
+                direction = Direction.NORTHWEST;
             } else if (!hasMaxX && !hasMaxY) {
-                exploreDirection = Direction.NORTHEAST;
+                direction = Direction.NORTHEAST;
             } else if (!hasMaxX && !hasMinY) {
-                exploreDirection = Direction.SOUTHEAST;
+                direction = Direction.SOUTHEAST;
             }
         }
 
-        tryMoveTo(uc.getLocation().add(exploreDirection.dx * 100, exploreDirection.dy * 100));
+        tryMoveTo(uc.getLocation().add(direction.dx * 100, direction.dy * 100));
+    }
+
+    private boolean findOpponentHQ() {
+        ExploredTiles exploredTiles = sharedArray.getExploredTiles();
+
+        List<Location> options = new ArrayList<>();
+
+        for (Symmetry symmetry : new Symmetry[]{
+            new RotationalSymmetry(sharedArray),
+            new HorizontalSymmetry(sharedArray),
+            new VerticalSymmetry(sharedArray)
+        }) {
+            Location option = symmetry.reflect(myHQ);
+            if (!exploredTiles.isExplored(option.x, option.y)) {
+                options.add(option);
+            }
+        }
+
+        Location firstOption = options.get(0);
+
+        if (options.size() == 1) {
+            sharedArray.setOpponentHQ(firstOption);
+            return false;
+        }
+
+        tryMoveTo(firstOption);
+        return true;
     }
 
     protected boolean tryMoveTo(Location target) {

@@ -4,10 +4,10 @@ import aic2023.user.Location;
 
 public class ExploredObject {
     public Location location;
-    public boolean occupied;
+    public int occupation;
 
-    public ExploredObject(Location location, boolean occupied) {
+    public ExploredObject(Location location, int occupation) {
         this.location = location;
-        this.occupied = occupied;
+        this.occupation = occupation;
     }
 }

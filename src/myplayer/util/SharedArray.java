@@ -22,6 +22,10 @@ public class SharedArray {
     private int INDEX_UNEXPLORED_USE_MIN_Y = INDEX_UNEXPLORED_USE_MIN_X + 1;
     private int INDEX_UNEXPLORED_OFFSET = INDEX_UNEXPLORED_USE_MIN_Y + 1;
 
+    public int OCCUPATION_EMPTY = 0;
+    public int OCCUPATION_ME = 1;
+    public int OCCUPATION_OPPONENT = 2;
+
     private UnitController uc;
 
     public SharedArray(UnitController uc) {
@@ -92,16 +96,16 @@ public class SharedArray {
         return getExploredObjects(INDEX_BASES_COUNT, INDEX_BASES_OFFSET);
     }
 
-    public void setExploredBase(Location location, boolean occupied) {
-        setExploredObject(INDEX_BASES_COUNT, INDEX_BASES_OFFSET, location, occupied);
+    public void setExploredBase(Location location, int occupation) {
+        setExploredObject(INDEX_BASES_COUNT, INDEX_BASES_OFFSET, location, occupation);
     }
 
     public ExploredObject[] getExploredStadiums() {
         return getExploredObjects(INDEX_STADIUMS_COUNT, INDEX_STADIUMS_OFFSET);
     }
 
-    public void setExploredStadium(Location location, boolean occupied) {
-        setExploredObject(INDEX_STADIUMS_COUNT, INDEX_STADIUMS_OFFSET, location, occupied);
+    public void setExploredStadium(Location location, int occupation) {
+        setExploredObject(INDEX_STADIUMS_COUNT, INDEX_STADIUMS_OFFSET, location, occupation);
     }
 
     public boolean hasExploredTiles() {
@@ -162,26 +166,26 @@ public class SharedArray {
         ExploredObject[] objects = new ExploredObject[count];
         for (int i = 0; i < count; i++) {
             Location location = intToLocation(uc.read(indexOffset + i * 2));
-            boolean occupied = uc.read(indexOffset + i * 2 + 1) == 1;
-            objects[i] = new ExploredObject(location, occupied);
+            int occupation = uc.read(indexOffset + i * 2 + 1);
+            objects[i] = new ExploredObject(location, occupation);
         }
 
         return objects;
     }
 
-    private void setExploredObject(int indexCount, int indexOffset, Location location, boolean occupied) {
+    private void setExploredObject(int indexCount, int indexOffset, Location location, int occupation) {
         int count = uc.read(indexCount);
 
         for (int i = 0; i < count; i++) {
             Location currentLocation = intToLocation(uc.read(indexOffset + i * 2));
             if (location.isEqual(currentLocation)) {
-                uc.write(indexOffset + i * 2 + 1, occupied ? 1 : 0);
+                uc.write(indexOffset + i * 2 + 1, occupation);
                 return;
             }
         }
 
         uc.write(indexOffset + count * 2, locationToInt(location));
-        uc.write(indexOffset + count * 2 + 1, occupied ? 1 : 0);
+        uc.write(indexOffset + count * 2 + 1, occupation);
         uc.write(indexCount, count + 1);
     }
 

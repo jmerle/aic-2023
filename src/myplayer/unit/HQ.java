@@ -27,7 +27,7 @@ public class HQ extends Unit {
 
             if (uc.getRound() < 100 && tryRecruit(UnitType.PITCHER)) {
                 didSomething = true;
-                return;
+                continue;
             }
 
             if (requiredCatchers == 0 && isInDanger()) {
@@ -36,7 +36,7 @@ public class HQ extends Unit {
 
             if (getCurrentCatchers() < requiredCatchers && tryRecruit(UnitType.CATCHER)) {
                 didSomething = true;
-                return;
+                continue;
             }
 
             if (preferCooldown == 0) {

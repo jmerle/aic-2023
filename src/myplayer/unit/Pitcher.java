@@ -44,7 +44,7 @@ public class Pitcher extends MoveableUnit {
         Location myLocation = uc.getLocation();
 
         for (ExploredObject object : objects) {
-            if (object.occupied) {
+            if (object.occupation != sharedArray.OCCUPATION_EMPTY) {
                 continue;
             }
 

@@ -24,6 +24,8 @@ public class Batter extends MoveableUnit {
 
             if (moveTarget != null) {
                 tryMoveTo(moveTarget);
+            } else {
+                explore();
             }
         }
 
@@ -56,8 +58,6 @@ public class Batter extends MoveableUnit {
                 }
             }
         }
-
-        explore();
     }
 
     private Location getMoveTarget() {

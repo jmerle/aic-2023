@@ -30,7 +30,7 @@ public class UnitPlayer {
         try {
             unit.run();
         } catch (Exception e) {
-            uc.println("Exception in unit #" + uc.getInfo().getID() + " (" + uc.getType() + "): " + e.getMessage());
+            uc.println("Exception in unit #" + uc.getInfo().getID() + " (" + uc.getType() + ") in round " + uc.getRound() + ": " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -43,6 +43,10 @@ public class UnitPlayer {
             : (maxBytecodes - startBytecodes) + Math.max(0, endRound - startBytecodes - 1) * maxBytecodes + endBytecodes;
 
         double bytecodePercentage = (double) usedBytecodes / (double) maxBytecodes * 100.0;
+        if (bytecodePercentage > 95) {
+            uc.println("High bytecode usage in unit #" + uc.getInfo().getID() + " (" + uc.getType() + ") in round " + uc.getRound() + ": " + usedBytecodes + " (" + bytecodePercentage + "%)");
+        }
+
         return bytecodePercentage < 100;
     }
 

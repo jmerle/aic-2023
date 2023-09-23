@@ -1,13 +1,15 @@
 package myplayer.util;
 
+import aic2023.user.Location;
+
 public class ExploredTiles {
     public long[] rows;
 
-    public int xOffset;
-    public boolean xOffsetSubtract;
+    private int xOffset;
+    private boolean xOffsetSubtract;
 
-    public int yOffset;
-    public boolean yOffsetSubtract;
+    private int yOffset;
+    private boolean yOffsetSubtract;
 
     public ExploredTiles(long[] rows, int xOffset, boolean xOffsetSubtract, int yOffset, boolean yOffsetSubtract) {
         this.rows = rows;
@@ -17,19 +19,19 @@ public class ExploredTiles {
         this.yOffsetSubtract = yOffsetSubtract;
     }
 
-    public boolean isExplored(int x, int y) {
-        x = xOffsetSubtract ? xOffset - x : x - xOffset;
-        y = yOffsetSubtract ? yOffset - y : y - yOffset;
+    public boolean isExplored(Location location) {
+        int x = xOffsetSubtract ? xOffset - location.x : location.x - xOffset;
+        int y = yOffsetSubtract ? yOffset - location.y : location.y - yOffset;
         return (rows[y] & (1L << x)) != 0;
     }
 
-    public void setExplored(int x, int y) {
-        x = xOffsetSubtract ? xOffset - x : x - xOffset;
-        y = yOffsetSubtract ? yOffset - y : y - yOffset;
+    public void setExplored(Location location) {
+        int x = xOffsetSubtract ? xOffset - location.x : location.x - xOffset;
+        int y = yOffsetSubtract ? yOffset - location.y : location.y - yOffset;
         rows[y] |= 1L << x;
     }
 
-    public int countUnexplored() {
+    public int countExplored() {
         int count = 0;
 
         for (long row : rows) {

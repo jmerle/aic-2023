@@ -42,6 +42,7 @@ public abstract class Unit {
     protected Location myHQ;
 
     private Symmetry symmetry;
+    private boolean sharedFullExploredData;
 
     public Unit(UnitController uc, UnitType type) {
         this.uc = uc;
@@ -147,12 +148,24 @@ public abstract class Unit {
 
         if (sharedArray.hasExploredTiles()) {
             ExploredTiles exploredTiles = sharedArray.getExploredTiles();
-            if (exploredTiles.countUnexplored() > 0) {
-                for (int[] offsets : rangeData.getRange((int) visionRange)) {
-                    exploredTiles.setExplored(myLocation.x + offsets[0], myLocation.y + offsets[1]);
+
+            int width = sharedArray.hasMapWidth() ? sharedArray.getMapWidth() : -1;
+            int height = sharedArray.hasMapHeight() ? sharedArray.getMapHeight() : -1;
+
+            if (width == -1 || height == -1 || exploredTiles.countExplored() < width * height) {
+                int[][] offsets = sharedFullExploredData
+                    ? rangeData.getOuterRing((int) visionRange)
+                    : rangeData.getRange((int) visionRange);
+
+                for (int[] offset : offsets) {
+                    Location location = myLocation.add(offset[0], offset[1]);
+                    if (!uc.isOutOfMap(location)) {
+                        exploredTiles.setExplored(location);
+                    }
                 }
 
                 sharedArray.setExploredTiles(exploredTiles);
+                sharedFullExploredData = true;
             }
         }
 
@@ -162,14 +175,14 @@ public abstract class Unit {
         if (currentSymmetry != null && exploredTiles != null) {
             for (ExploredObject object : sharedArray.getExploredBases()) {
                 Location reflected = currentSymmetry.reflect(object.location);
-                if (!exploredTiles.isExplored(reflected.x, reflected.y)) {
+                if (!exploredTiles.isExplored(reflected)) {
                     sharedArray.setExploredBase(object.location, sharedArray.OCCUPATION_EMPTY);
                 }
             }
 
             for (ExploredObject object : sharedArray.getExploredStadiums()) {
                 Location reflected = currentSymmetry.reflect(object.location);
-                if (!exploredTiles.isExplored(reflected.x, reflected.y)) {
+                if (!exploredTiles.isExplored(reflected)) {
                     sharedArray.setExploredStadium(object.location, sharedArray.OCCUPATION_EMPTY);
                 }
             }
@@ -188,7 +201,7 @@ public abstract class Unit {
     }
 
     protected boolean hasSymmetry() {
-        return sharedArray.getOpponentHQ() != null;
+        return sharedArray.hasMapSize() && sharedArray.getOpponentHQ() != null;
     }
 
     protected Symmetry getSymmetry() {

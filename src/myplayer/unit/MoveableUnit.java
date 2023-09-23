@@ -36,12 +36,7 @@ public abstract class MoveableUnit extends Unit {
     }
 
     protected void explore() {
-        boolean hasMinX = sharedArray.hasMinX();
-        boolean hasMaxX = sharedArray.hasMaxX();
-        boolean hasMinY = sharedArray.hasMinY();
-        boolean hasMaxY = sharedArray.hasMaxY();
-
-        if (!hasMinX || !hasMaxX || !hasMinY || !hasMaxY) {
+        if (!sharedArray.hasMapSize()) {
             findBoundaries();
             return;
         } else if (sharedArray.getOpponentHQ() == null && findOpponentHQ()) {
@@ -56,15 +51,16 @@ public abstract class MoveableUnit extends Unit {
         ExploredTiles exploredTiles = sharedArray.getExploredTiles();
 
         if (explorationTarget == null
-            || exploredTiles.isExplored(explorationTarget.x, explorationTarget.y)
+            || exploredTiles.isExplored(explorationTarget)
             || uc.canSenseLocation(explorationTarget)) {
             int attempts = 10;
 
             for (int i = 0; i < attempts; i++) {
                 int x = RandomUtils.nextInt(minX, maxX + 1);
                 int y = RandomUtils.nextInt(minY, maxY + 1);
+                Location location = new Location(x, y);
 
-                if (i != attempts - 1 && exploredTiles.isExplored(x, y)) {
+                if (i != attempts - 1 && exploredTiles.isExplored(location)) {
                     continue;
                 }
 
@@ -118,7 +114,7 @@ public abstract class MoveableUnit extends Unit {
             new VerticalSymmetry(sharedArray)
         }) {
             Location option = symmetry.reflect(myHQ);
-            if (!exploredTiles.isExplored(option.x, option.y)) {
+            if (!exploredTiles.isExplored(option)) {
                 options.add(option);
             }
         }

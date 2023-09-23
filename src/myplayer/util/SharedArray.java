@@ -66,6 +66,14 @@ public class SharedArray {
         uc.write(INDEX_HAS_MAX_X, 1);
     }
 
+    public boolean hasMapWidth() {
+        return hasMinX() && hasMaxX();
+    }
+
+    public int getMapWidth() {
+        return getMaxX() - getMinX() + 1;
+    }
+
     public boolean hasMinY() {
         return uc.read(INDEX_HAS_MIN_Y) == 1;
     }
@@ -92,6 +100,18 @@ public class SharedArray {
         uc.write(INDEX_HAS_MAX_Y, 1);
     }
 
+    public boolean hasMapHeight() {
+        return hasMinY() && hasMaxY();
+    }
+
+    public int getMapHeight() {
+        return getMaxY() - getMinY() + 1;
+    }
+
+    public boolean hasMapSize() {
+        return hasMapWidth() && hasMapHeight();
+    }
+
     public ExploredObject[] getExploredBases() {
         return getExploredObjects(INDEX_BASES_COUNT, INDEX_BASES_OFFSET);
     }
@@ -113,9 +133,7 @@ public class SharedArray {
     }
 
     public ExploredTiles getExploredTiles() {
-        int rowCount = hasMinY() && hasMaxY()
-            ? getMaxY() - getMinY() + 1
-            : GameConstants.MAX_MAP_SIZE;
+        int rowCount = hasMapHeight() ? getMapHeight() : GameConstants.MAX_MAP_SIZE;
 
         long[] rows = new long[rowCount];
         for (int i = 0; i < rowCount; i++) {

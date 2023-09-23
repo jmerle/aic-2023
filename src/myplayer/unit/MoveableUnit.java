@@ -4,8 +4,6 @@ import aic2023.user.Direction;
 import aic2023.user.Location;
 import aic2023.user.MapObject;
 import aic2023.user.UnitController;
-import aic2023.user.UnitInfo;
-import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
 import myplayer.symmetry.HorizontalSymmetry;
 import myplayer.symmetry.RotationalSymmetry;
@@ -100,7 +98,7 @@ public abstract class MoveableUnit extends Unit {
             }
         }
 
-        tryMoveTo(uc.getLocation().add(direction.dx * 100, direction.dy * 100));
+        tryMoveTo(myHQ.add(direction.dx * 100, direction.dy * 100));
     }
 
     private boolean findOpponentHQ() {

@@ -32,17 +32,12 @@ public class Batter extends MoveableUnit {
 
         if (uc.canAct()) {
             Location myLocation = uc.getLocation();
-            int minDistance = myLocation.distanceSquared(myHQ);
 
             for (Direction direction : adjacentDirections) {
                 boolean batted = false;
 
                 for (int i = 1; i <= 3; i++) {
                     Location location = myLocation.add(direction.dx * i, direction.dy * i);
-                    if (location.distanceSquared(myHQ) < minDistance) {
-                        break;
-                    }
-
                     if (!uc.canSenseLocation(location)) {
                         break;
                     }

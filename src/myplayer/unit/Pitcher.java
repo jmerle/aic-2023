@@ -30,7 +30,6 @@ public class Pitcher extends MoveableUnit {
         }
 
         if (target != null) {
-            uc.drawLineDebug(uc.getLocation(), target, 255, 0, 0);
             tryMoveTo(target);
         } else {
             explore();

@@ -7,8 +7,7 @@ import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
 
 public class HQ extends Unit {
-    private boolean preferBatter = true;
-    private int preferCooldown = 10;
+    private boolean recruitBatter = true;
 
     public HQ(UnitController uc) {
         super(uc, UnitType.HQ);
@@ -22,19 +21,10 @@ public class HQ extends Unit {
         while (didSomething) {
             didSomething = false;
 
-            if (preferCooldown == 0) {
-                preferBatter = !preferBatter;
-                preferCooldown = 10;
-            }
-
-            UnitType type = preferBatter ? UnitType.BATTER : UnitType.PITCHER;
+            UnitType type = recruitBatter ? UnitType.BATTER : UnitType.PITCHER;
             if (tryRecruit(type)) {
                 didSomething = true;
-                preferBatter = !preferBatter;
-                preferCooldown = 10;
-                continue;
-            } else {
-                preferCooldown--;
+                recruitBatter = !recruitBatter;
             }
         }
     }

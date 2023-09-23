@@ -4,6 +4,7 @@ import aic2023.user.Direction;
 import aic2023.user.Location;
 import aic2023.user.UnitController;
 import aic2023.user.UnitInfo;
+import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
 import myplayer.util.ExploredObject;
 
@@ -31,23 +32,28 @@ public class Batter extends MoveableUnit {
 
         if (uc.canAct()) {
             Location myLocation = uc.getLocation();
+            int minDistance = myLocation.distanceSquared(myHQ);
 
             for (Direction direction : adjacentDirections) {
                 boolean batted = false;
 
                 for (int i = 1; i <= 3; i++) {
-                    Location location = myLocation.add(direction);
+                    Location location = myLocation.add(direction.dx * i, direction.dy * i);
+                    if (location.distanceSquared(myHQ) < minDistance) {
+                        break;
+                    }
+
                     if (!uc.canSenseLocation(location)) {
                         break;
                     }
 
-                    UnitInfo unit = uc.senseUnitAtLocation(myLocation.add(direction));
+                    UnitInfo unit = uc.senseUnitAtLocation(location);
                     if (unit == null) {
                         continue;
                     }
 
                     if (unit.getTeam() == opponentTeam && unit.getType() != UnitType.HQ) {
-                        batted = tryBat(direction, i);
+                        batted = tryBat(direction, 3);
                     }
 
                     break;
@@ -86,6 +92,22 @@ public class Batter extends MoveableUnit {
             int distance = myLocation.distanceSquared(object.location);
             if (distance < minDistance) {
                 bestLocation = object.location;
+                minDistance = distance;
+            }
+        }
+
+        if (bestLocation != null) {
+            return bestLocation;
+        }
+
+        for (UnitInfo unit : uc.senseUnits(me.getStat(UnitStat.VISION_RANGE), opponentTeam)) {
+            if (unit.getType() == UnitType.HQ) {
+                continue;
+            }
+
+            int distance = myLocation.distanceSquared(unit.getLocation());
+            if (distance < minDistance) {
+                bestLocation = unit.getLocation();
                 minDistance = distance;
             }
         }

@@ -12,6 +12,6 @@ public class Batter extends MoveableUnit {
     public void run() {
         super.run();
 
-        tryMoveRandom();
+        explore();
     }
 }

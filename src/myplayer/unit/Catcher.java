@@ -12,6 +12,6 @@ public class Catcher extends MoveableUnit {
     public void run() {
         super.run();
 
-        tryMoveRandom();
+        explore();
     }
 }

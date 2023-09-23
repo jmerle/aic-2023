@@ -40,24 +40,17 @@ public class SharedArray {
         return uc.read(INDEX_HAS_MIN_X) == 1;
     }
 
-    public void setHasMinX(boolean state) {
-        uc.write(INDEX_HAS_MIN_X, state ? 1 : 0);
-    }
-
     public int getMinX() {
         return uc.read(INDEX_MIN_X);
     }
 
     public void setMinX(int value) {
         uc.write(INDEX_MIN_X, value);
+        uc.write(INDEX_HAS_MIN_X, 1);
     }
 
     public boolean hasMaxX() {
         return uc.read(INDEX_HAS_MAX_X) == 1;
-    }
-
-    public void setHasMaxX(boolean state) {
-        uc.write(INDEX_HAS_MAX_X, state ? 1 : 0);
     }
 
     public int getMaxX() {
@@ -66,14 +59,11 @@ public class SharedArray {
 
     public void setMaxX(int value) {
         uc.write(INDEX_MAX_X, value);
+        uc.write(INDEX_HAS_MAX_X, 1);
     }
 
     public boolean hasMinY() {
         return uc.read(INDEX_HAS_MIN_Y) == 1;
-    }
-
-    public void setHasMinY(boolean state) {
-        uc.write(INDEX_HAS_MIN_Y, state ? 1 : 0);
     }
 
     public int getMinY() {
@@ -82,14 +72,11 @@ public class SharedArray {
 
     public void setMinY(int value) {
         uc.write(INDEX_MIN_Y, value);
+        uc.write(INDEX_HAS_MIN_Y, 1);
     }
 
     public boolean hasMaxY() {
         return uc.read(INDEX_HAS_MAX_Y) == 1;
-    }
-
-    public void setHasMaxY(boolean state) {
-        uc.write(INDEX_HAS_MAX_Y, state ? 1 : 0);
     }
 
     public int getMaxY() {
@@ -98,6 +85,7 @@ public class SharedArray {
 
     public void setMaxY(int value) {
         uc.write(INDEX_MAX_Y, value);
+        uc.write(INDEX_HAS_MAX_Y, 1);
     }
 
     public ExploredObject[] getExploredBases() {
@@ -122,7 +110,7 @@ public class SharedArray {
 
     public ExploredTiles getExploredTiles() {
         int rowCount = hasMinY() && hasMaxY()
-            ? getMaxY() - getMinY()
+            ? getMaxY() - getMinY() + 1
             : GameConstants.MAX_MAP_SIZE;
 
         long[] rows = new long[rowCount];

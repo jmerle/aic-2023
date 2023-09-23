@@ -7,6 +7,7 @@ import aic2023.user.UnitController;
 import aic2023.user.UnitInfo;
 import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
+import myplayer.util.ExploredTiles;
 import myplayer.util.RandomUtils;
 
 public abstract class MoveableUnit extends Unit {
@@ -17,6 +18,8 @@ public abstract class MoveableUnit extends Unit {
     private int distanceBeforeWallFollowing;
     private boolean wallOnRight;
     private Location lastFollowedWall;
+
+    private Location explorationTarget;
 
     public MoveableUnit(UnitController uc, UnitType type) {
         super(uc, type);
@@ -34,6 +37,76 @@ public abstract class MoveableUnit extends Unit {
                 }
             }
         }
+    }
+
+    protected void explore() {
+        boolean hasMinX = sharedArray.hasMinX();
+        boolean hasMaxX = sharedArray.hasMaxX();
+        boolean hasMinY = sharedArray.hasMinY();
+        boolean hasMaxY = sharedArray.hasMaxY();
+
+        if (!hasMinX || !hasMaxX || !hasMinY || !hasMaxY) {
+            exploreBoundaries();
+            return;
+        }
+
+        int minX = sharedArray.getMinX();
+        int maxX = sharedArray.getMaxX();
+        int minY = sharedArray.getMinY();
+        int maxY = sharedArray.getMaxY();
+
+        ExploredTiles exploredTiles = sharedArray.getExploredTiles();
+
+        if (explorationTarget == null
+            || exploredTiles.isExplored(explorationTarget.x, explorationTarget.y)
+            || uc.canSenseLocation(explorationTarget)) {
+            int attempts = 10;
+
+            for (int i = 0; i < attempts; i++) {
+                int x = RandomUtils.nextInt(minX, maxX + 1);
+                int y = RandomUtils.nextInt(minY, maxY + 1);
+
+                if (i != attempts - 1 && exploredTiles.isExplored(x, y)) {
+                    continue;
+                }
+
+                explorationTarget = new Location(x, y);
+            }
+        }
+
+        tryMoveTo(explorationTarget);
+    }
+
+    private void exploreBoundaries() {
+        boolean hasMinX = sharedArray.hasMinX();
+        boolean hasMaxX = sharedArray.hasMaxX();
+        boolean hasMinY = sharedArray.hasMinY();
+        boolean hasMaxY = sharedArray.hasMaxY();
+
+        Direction exploreDirection = null;
+        if (!hasMinX) {
+            exploreDirection = Direction.WEST;
+        } else if (!hasMaxX) {
+            exploreDirection = Direction.EAST;
+        } else if (!hasMinY) {
+            exploreDirection = Direction.SOUTH;
+        } else if (!hasMaxY) {
+            exploreDirection = Direction.NORTH;
+        }
+
+        if (uc.getInfo().getID() % 2 == 0) {
+            if (!hasMinX && !hasMinY) {
+                exploreDirection = Direction.SOUTHWEST;
+            } else if (!hasMinX && !hasMaxY) {
+                exploreDirection = Direction.NORTHWEST;
+            } else if (!hasMaxX && !hasMaxY) {
+                exploreDirection = Direction.NORTHEAST;
+            } else if (!hasMaxX && !hasMinY) {
+                exploreDirection = Direction.SOUTHEAST;
+            }
+        }
+
+        tryMoveTo(uc.getLocation().add(exploreDirection.dx * 100, exploreDirection.dy * 100));
     }
 
     protected boolean tryMoveTo(Location target) {

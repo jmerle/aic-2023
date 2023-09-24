@@ -14,7 +14,6 @@ import myplayer.symmetry.Symmetry;
 import myplayer.symmetry.VerticalSymmetry;
 import myplayer.util.ExploredObject;
 import myplayer.util.ExploredTiles;
-import myplayer.util.RangeData;
 import myplayer.util.SharedArray;
 
 public abstract class Unit {
@@ -26,7 +25,6 @@ public abstract class Unit {
     protected Team opponentTeam;
 
     protected SharedArray sharedArray;
-    protected RangeData rangeData;
 
     protected Direction[] adjacentDirections = {
         Direction.NORTH,
@@ -42,7 +40,10 @@ public abstract class Unit {
     protected Location myHQ;
 
     private Symmetry symmetry;
+
+    private int startRound = -1;
     private boolean sharedFullExploredData;
+    private Location previousExploreLocation;
 
     public Unit(UnitController uc, UnitType type) {
         this.uc = uc;
@@ -53,7 +54,6 @@ public abstract class Unit {
         opponentTeam = myTeam.getOpponent();
 
         sharedArray = new SharedArray(uc);
-        rangeData = new RangeData();
     }
 
     public void run() {
@@ -71,6 +71,10 @@ public abstract class Unit {
                     }
                 }
             }
+        }
+
+        if (startRound == -1) {
+            startRound = uc.getRound();
         }
 
         if (sharedArray.getOpponentHQ() == null) {
@@ -146,27 +150,31 @@ public abstract class Unit {
             sharedArray.setExploredStadium(location, getOccupation(location));
         }
 
-        if (sharedArray.hasExploredTiles()) {
+        if (uc.getRound() == startRound) {
+            return;
+        }
+
+        boolean exploredFull = false;
+        if (sharedArray.hasExploredTiles() && !uc.getLocation().isEqual(previousExploreLocation)) {
             ExploredTiles exploredTiles = sharedArray.getExploredTiles();
 
             int width = sharedArray.hasMapWidth() ? sharedArray.getMapWidth() : -1;
             int height = sharedArray.hasMapHeight() ? sharedArray.getMapHeight() : -1;
 
             if (width == -1 || height == -1 || exploredTiles.countExplored() < width * height) {
-                int[][] offsets = sharedFullExploredData
-                    ? rangeData.getOuterRing((int) visionRange)
-                    : rangeData.getRange((int) visionRange);
+                exploredTiles.markExplored(!sharedFullExploredData);
 
-                for (int[] offset : offsets) {
-                    Location location = myLocation.add(offset[0], offset[1]);
-                    if (!uc.isOutOfMap(location)) {
-                        exploredTiles.setExplored(location);
-                    }
-                }
+                exploredFull = !sharedFullExploredData;
+                sharedFullExploredData = true;
 
                 sharedArray.setExploredTiles(exploredTiles);
-                sharedFullExploredData = true;
             }
+
+            previousExploreLocation = uc.getLocation();
+        }
+
+        if (exploredFull) {
+            return;
         }
 
         Symmetry currentSymmetry = hasSymmetry() ? getSymmetry() : null;

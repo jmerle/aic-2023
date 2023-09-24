@@ -166,7 +166,7 @@ public class SharedArray {
         int yOffset = useMinY ? getMinY() : getMaxY();
         boolean yOffsetSubtract = !useMinY;
 
-        return new ExploredTiles(rows, xOffset, xOffsetSubtract, yOffset, yOffsetSubtract);
+        return new ExploredTiles(uc, rows, xOffset, xOffsetSubtract, yOffset, yOffsetSubtract);
     }
 
     public void setExploredTiles(ExploredTiles tiles) {

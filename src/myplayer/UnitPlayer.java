@@ -1,5 +1,6 @@
 package myplayer;
 
+import aic2023.user.Location;
 import aic2023.user.UnitController;
 import aic2023.user.UnitType;
 import myplayer.unit.Batter;
@@ -30,7 +31,7 @@ public class UnitPlayer {
         try {
             unit.run();
         } catch (Exception e) {
-            uc.println("Exception in unit #" + uc.getInfo().getID() + " (" + uc.getType() + ") in round " + uc.getRound() + ": " + e.getMessage());
+            uc.println(getLogPrefix(uc) + "Exception: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -44,10 +45,15 @@ public class UnitPlayer {
 
         double bytecodePercentage = (double) usedBytecodes / (double) maxBytecodes * 100.0;
         if (bytecodePercentage > 95) {
-            uc.println("High bytecode usage in unit #" + uc.getInfo().getID() + " (" + uc.getType() + ") in round " + uc.getRound() + ": " + usedBytecodes + " (" + bytecodePercentage + "%)");
+            uc.println(getLogPrefix(uc) + "High bytecode usage: " + usedBytecodes + " (" + bytecodePercentage + "%)");
         }
 
         return bytecodePercentage < 100;
+    }
+
+    private String getLogPrefix(UnitController uc) {
+        Location location = uc.getLocation();
+        return "[" + uc.getTeam() + "|" + uc.getRound() + "|" + uc.getInfo().getID() + "|" + uc.getType() + "|" + location.x + "," + location.y + "] ";
     }
 
     private Unit createUnit(UnitController uc) {

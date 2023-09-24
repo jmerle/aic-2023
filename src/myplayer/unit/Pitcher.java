@@ -24,11 +24,7 @@ public class Pitcher extends MoveableUnit {
             return;
         }
 
-        Location target = getClosestUnoccupiedObject(sharedArray.getExploredStadiums());
-        if (target == null) {
-            target = getClosestUnoccupiedObject(sharedArray.getExploredBases());
-        }
-
+        Location target = getClosestUnoccupiedObject();
         if (target != null) {
             tryMoveTo(target);
         } else {
@@ -36,13 +32,25 @@ public class Pitcher extends MoveableUnit {
         }
     }
 
-    private Location getClosestUnoccupiedObject(ExploredObject[] objects) {
+    private Location getClosestUnoccupiedObject() {
         Location bestLocation = null;
         int minDistance = Integer.MAX_VALUE;
 
         Location myLocation = uc.getLocation();
 
-        for (ExploredObject object : objects) {
+        for (ExploredObject object : sharedArray.getExploredBases()) {
+            if (object.occupation != sharedArray.OCCUPATION_EMPTY) {
+                continue;
+            }
+
+            int distance = myLocation.distanceSquared(object.location);
+            if (distance < minDistance) {
+                bestLocation = object.location;
+                minDistance = distance;
+            }
+        }
+
+        for (ExploredObject object : sharedArray.getExploredStadiums()) {
             if (object.occupation != sharedArray.OCCUPATION_EMPTY) {
                 continue;
             }

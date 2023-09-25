@@ -1,7 +1,6 @@
 package myplayer.unit;
 
 import aic2023.user.Direction;
-import aic2023.user.GameConstants;
 import aic2023.user.Location;
 import aic2023.user.UnitController;
 import aic2023.user.UnitInfo;
@@ -86,6 +85,76 @@ public class HQ extends Unit {
             return false;
         }
 
+        if (type == UnitType.BATTER) {
+            return tryRecruitOffensive(type);
+        } else {
+            return tryRecruitDefensive(type);
+        }
+    }
+
+    private boolean tryRecruitOffensive(UnitType type) {
+        UnitInfo[] opponentUnits = uc.senseUnits(18, opponentTeam);
+
+        for (Direction direction : recruitDirections) {
+            if (!uc.canRecruitUnit(type, direction)) {
+                continue;
+            }
+
+            Location recruitLocation = myHQ.add(direction);
+
+            for (UnitInfo unit : opponentUnits) {
+                if (unit.getType() == type && unit.getLocation().distanceSquared(recruitLocation) <= 2) {
+                    uc.recruitUnit(type, direction);
+                    return true;
+                }
+            }
+        }
+
+        for (Direction direction : recruitDirections) {
+            if (!uc.canRecruitUnit(type, direction)) {
+                continue;
+            }
+
+            Location recruitLocation = myHQ.add(direction);
+
+            for (UnitInfo unit : opponentUnits) {
+                if (unit.getType() == type && unit.getLocation().distanceSquared(recruitLocation) <= 8) {
+                    uc.recruitUnit(type, direction);
+                    return true;
+                }
+            }
+        }
+
+        for (Direction direction : recruitDirections) {
+            if (tryRecruit(type, direction)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean tryRecruitDefensive(UnitType type) {
+        UnitInfo[] opponentUnits = uc.senseUnits(18, opponentTeam);
+
+        outer:
+        for (Direction direction : recruitDirections) {
+            if (!uc.canRecruitUnit(type, direction)) {
+                continue;
+            }
+
+            Location recruitLocation = myHQ.add(direction);
+
+            for (UnitInfo unit : opponentUnits) {
+                if (unit.getType() == UnitType.BATTER && unit.getLocation().distanceSquared(recruitLocation) <= 8) {
+                    continue outer;
+                }
+            }
+
+            uc.recruitUnit(type, direction);
+            return true;
+        }
+
         for (Direction direction : recruitDirections) {
             if (tryRecruit(type, direction)) {
                 return true;
@@ -98,29 +167,6 @@ public class HQ extends Unit {
     private boolean tryRecruit(UnitType type, Direction direction) {
         if (uc.canRecruitUnit(type, direction)) {
             uc.recruitUnit(type, direction);
-            return true;
-        }
-
-        return false;
-    }
-
-    private boolean tryConstructBall() {
-        if (uc.getReputation() < GameConstants.BALL_COST) {
-            return false;
-        }
-
-        for (Direction direction : recruitDirections) {
-            if (tryConstructBall(direction)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean tryConstructBall(Direction direction) {
-        if (uc.canConstructBall(direction)) {
-            uc.constructBall(direction);
             return true;
         }
 

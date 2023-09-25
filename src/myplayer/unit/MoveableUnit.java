@@ -11,7 +11,6 @@ import myplayer.symmetry.HorizontalSymmetry;
 import myplayer.symmetry.RotationalSymmetry;
 import myplayer.symmetry.Symmetry;
 import myplayer.symmetry.VerticalSymmetry;
-import myplayer.util.ExploredTiles;
 import myplayer.util.RandomUtils;
 
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ public abstract class MoveableUnit extends Unit {
         if (!sharedArray.hasMapSize()) {
             findBoundaries();
             return;
-        } else if (sharedArray.getOpponentHQ() == null && findOpponentHQ()) {
+        } else if (sharedArray.getOpponentHQ() == null && tryFindOpponentHQ()) {
             return;
         }
 
@@ -50,8 +49,6 @@ public abstract class MoveableUnit extends Unit {
         int maxX = sharedArray.getMaxX();
         int minY = sharedArray.getMinY();
         int maxY = sharedArray.getMaxY();
-
-        ExploredTiles exploredTiles = sharedArray.getExploredTiles();
 
         if (explorationTarget == null
             || exploredTiles.isExplored(explorationTarget)
@@ -71,7 +68,7 @@ public abstract class MoveableUnit extends Unit {
             }
         }
 
-        tryMoveTo(explorationTarget);
+        moveTo(explorationTarget);
     }
 
     private void findBoundaries() {
@@ -103,11 +100,13 @@ public abstract class MoveableUnit extends Unit {
             }
         }
 
-        tryMoveTo(myHQ.add(direction.dx * 100, direction.dy * 100));
+        moveTo(myHQ.add(direction.dx * 100, direction.dy * 100));
     }
 
-    private boolean findOpponentHQ() {
-        ExploredTiles exploredTiles = sharedArray.getExploredTiles();
+    private boolean tryFindOpponentHQ() {
+        if (exploredTiles == null) {
+            return true;
+        }
 
         List<Location> options = new ArrayList<>();
 
@@ -129,18 +128,14 @@ public abstract class MoveableUnit extends Unit {
             return false;
         }
 
-        tryMoveTo(firstOption);
+        moveTo(firstOption);
         return true;
     }
 
-    protected boolean tryMoveTo(Location target) {
-        if (!uc.canMove()) {
-            return false;
-        }
-
+    protected void moveTo(Location target) {
         Location myLocation = uc.getLocation();
         if (myLocation.isEqual(target)) {
-            return false;
+            return;
         }
 
         if (!target.isEqual(currentTarget)) {
@@ -160,7 +155,8 @@ public abstract class MoveableUnit extends Unit {
         if (!isWallFollowing) {
             Direction forward = myLocation.directionTo(target);
             if (isPassable(myLocation.add(forward))) {
-                return tryMove(forward);
+                tryMove(forward);
+                return;
             } else {
                 isWallFollowing = true;
                 distanceBeforeWallFollowing = currentDistance;
@@ -168,7 +164,7 @@ public abstract class MoveableUnit extends Unit {
             }
         }
 
-        return followWall(true);
+        followWall(true);
     }
 
     private void setInitialWallFollowingDirection() {
@@ -219,7 +215,7 @@ public abstract class MoveableUnit extends Unit {
         }
     }
 
-    private boolean followWall(boolean canRotate) {
+    private void followWall(boolean canRotate) {
         Location myLocation = uc.getLocation();
 
         Direction direction = myLocation.directionTo(lastFollowedWall);
@@ -230,17 +226,16 @@ public abstract class MoveableUnit extends Unit {
 
             if (canRotate && uc.isOutOfMap(location)) {
                 wallOnRight = !wallOnRight;
-                return followWall(false);
+                followWall(false);
+                return;
             }
 
             if (isPassable(location) && tryMove(direction)) {
-                return true;
+                return;
             }
 
             lastFollowedWall = location;
         }
-
-        return false;
     }
 
     private boolean isPassable(Location location) {

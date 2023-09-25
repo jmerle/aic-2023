@@ -17,7 +17,7 @@ public class Catcher extends MoveableUnit {
 
         Location closestBall = getClosestBall();
         if (closestBall != null) {
-            tryMoveTo(closestBall);
+            moveTo(closestBall);
         } else {
             explore();
         }

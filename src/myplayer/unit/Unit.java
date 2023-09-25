@@ -24,6 +24,7 @@ public abstract class Unit {
     protected Team opponentTeam;
 
     protected SharedArray sharedArray;
+    protected ExploredTiles exploredTiles;
 
     protected Direction[] adjacentDirections = {
         Direction.NORTH,
@@ -153,19 +154,21 @@ public abstract class Unit {
             return;
         }
 
-        if (sharedArray.hasExploredTiles() && !uc.getLocation().isEqual(previousExploreLocation)) {
-            ExploredTiles exploredTiles = sharedArray.getExploredTiles();
+        if (sharedArray.hasExploredTiles()) {
+            exploredTiles = sharedArray.getExploredTiles();
 
-            int width = sharedArray.hasMapWidth() ? sharedArray.getMapWidth() : -1;
-            int height = sharedArray.hasMapHeight() ? sharedArray.getMapHeight() : -1;
+            if (!uc.getLocation().isEqual(previousExploreLocation)) {
+                int width = sharedArray.hasMapWidth() ? sharedArray.getMapWidth() : -1;
+                int height = sharedArray.hasMapHeight() ? sharedArray.getMapHeight() : -1;
 
-            if (width == -1 || height == -1 || exploredTiles.countExplored() < width * height) {
-                exploredTiles.markExplored(!sharedFullExploredData);
-                sharedFullExploredData = true;
-                sharedArray.setExploredTiles(exploredTiles);
+                if (width == -1 || height == -1 || exploredTiles.countExplored() < width * height) {
+                    exploredTiles.markExplored(!sharedFullExploredData);
+                    sharedFullExploredData = true;
+                    sharedArray.setExploredTiles(exploredTiles);
+                }
+
+                previousExploreLocation = uc.getLocation();
             }
-
-            previousExploreLocation = uc.getLocation();
         }
     }
 

@@ -26,7 +26,7 @@ public class Pitcher extends MoveableUnit {
 
         Location target = getClosestUnoccupiedObject();
         if (target != null) {
-            tryMoveTo(target);
+            moveTo(target);
         } else {
             explore();
         }

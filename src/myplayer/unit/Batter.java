@@ -128,7 +128,7 @@ public class Batter extends MoveableUnit {
         }
 
         if (bestLocation != null) {
-            tryMoveTo(bestLocation);
+            moveTo(bestLocation);
             return;
         }
 
@@ -149,7 +149,7 @@ public class Batter extends MoveableUnit {
         }
 
         if (bestLocation != null) {
-            tryMoveTo(bestLocation);
+            moveTo(bestLocation);
         }
     }
 

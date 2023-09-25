@@ -36,9 +36,8 @@ public class HQ extends Unit {
             sortedRecruitDirections = true;
         }
 
-        if (uc.getRound() - spawnRound > 2 && hasSymmetry() && sharedArray.hasExploredTiles()) {
+        if (uc.getRound() - spawnRound > 2 && hasSymmetry() && exploredTiles != null) {
             Symmetry symmetry = getSymmetry();
-            ExploredTiles exploredTiles = sharedArray.getExploredTiles();
 
             for (ExploredObject object : sharedArray.getExploredBases()) {
                 Location reflected = symmetry.reflect(object.location);

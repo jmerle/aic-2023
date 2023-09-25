@@ -136,10 +136,9 @@ public class SharedArray {
         int rowCount = hasMapHeight() ? getMapHeight() : GameConstants.MAX_MAP_SIZE;
 
         long[] rows = new long[rowCount];
-        for (int i = 0; i < rowCount; i++) {
-            int part1 = uc.read(INDEX_UNEXPLORED_OFFSET + i * 2);
-            int part2 = uc.read(INDEX_UNEXPLORED_OFFSET + i * 2 + 1);
-            rows[i] = (((long) part1) << 32) | (part2 & 0xffffffffL);
+        for (int i = rowCount; --i >= 0; ) {
+            int index = INDEX_UNEXPLORED_OFFSET + i * 2;
+            rows[i] = (((long) uc.read(index)) << 32) | (uc.read(index + 1) & 0xffffffffL);
         }
 
         int useMinXValue = uc.read(INDEX_UNEXPLORED_USE_MIN_X);
@@ -170,11 +169,9 @@ public class SharedArray {
     }
 
     public void setExploredTiles(ExploredTiles tiles) {
-        for (int i = 0; i < tiles.rows.length; i++) {
-            int part1 = (int) (tiles.rows[i] >> 32);
-            int part2 = (int) tiles.rows[i];
-            uc.write(INDEX_UNEXPLORED_OFFSET + i * 2, part1);
-            uc.write(INDEX_UNEXPLORED_OFFSET + i * 2 + 1, part2);
+        for (int i = tiles.rows.length; --i >= 0; ) {
+            uc.write(INDEX_UNEXPLORED_OFFSET + i * 2, (int) (tiles.rows[i] >> 32));
+            uc.write(INDEX_UNEXPLORED_OFFSET + i * 2 + 1, (int) tiles.rows[i]);
         }
     }
 

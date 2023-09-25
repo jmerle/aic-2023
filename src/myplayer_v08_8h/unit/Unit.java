@@ -1,4 +1,4 @@
-package myplayer_v08.unit;
+package myplayer_v08_8h.unit;
 
 import aic2023.user.Direction;
 import aic2023.user.Location;
@@ -8,14 +8,14 @@ import aic2023.user.UnitController;
 import aic2023.user.UnitInfo;
 import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
-import myplayer_v08.symmetry.HorizontalSymmetry;
-import myplayer_v08.symmetry.RotationalSymmetry;
-import myplayer_v08.symmetry.Symmetry;
-import myplayer_v08.symmetry.VerticalSymmetry;
-import myplayer_v08.util.ExploredObject;
-import myplayer_v08.util.ExploredTiles;
-import myplayer_v08.util.RangeData;
-import myplayer_v08.util.SharedArray;
+import myplayer_v08_8h.symmetry.HorizontalSymmetry;
+import myplayer_v08_8h.symmetry.RotationalSymmetry;
+import myplayer_v08_8h.symmetry.Symmetry;
+import myplayer_v08_8h.symmetry.VerticalSymmetry;
+import myplayer_v08_8h.util.ExploredObject;
+import myplayer_v08_8h.util.ExploredTiles;
+import myplayer_v08_8h.util.RangeData;
+import myplayer_v08_8h.util.SharedArray;
 
 public abstract class Unit {
     protected UnitController uc;

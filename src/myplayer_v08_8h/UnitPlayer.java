@@ -1,12 +1,12 @@
-package myplayer_v08;
+package myplayer_v08_8h;
 
 import aic2023.user.UnitController;
 import aic2023.user.UnitType;
-import myplayer_v08.unit.Batter;
-import myplayer_v08.unit.Catcher;
-import myplayer_v08.unit.HQ;
-import myplayer_v08.unit.Pitcher;
-import myplayer_v08.unit.Unit;
+import myplayer_v08_8h.unit.Batter;
+import myplayer_v08_8h.unit.Catcher;
+import myplayer_v08_8h.unit.HQ;
+import myplayer_v08_8h.unit.Pitcher;
+import myplayer_v08_8h.unit.Unit;
 
 public class UnitPlayer {
     public void run(UnitController uc) {

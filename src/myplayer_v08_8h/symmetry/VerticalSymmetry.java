@@ -1,7 +1,7 @@
-package myplayer_v08.symmetry;
+package myplayer_v08_8h.symmetry;
 
 import aic2023.user.Location;
-import myplayer_v08.util.SharedArray;
+import myplayer_v08_8h.util.SharedArray;
 
 public class VerticalSymmetry extends Symmetry {
     public VerticalSymmetry(SharedArray sharedArray) {

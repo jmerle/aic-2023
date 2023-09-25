@@ -1,6 +1,6 @@
-package myplayer_v08.symmetry;
+package myplayer_v08_8h.symmetry;
 
-import myplayer_v08.util.SharedArray;
+import myplayer_v08_8h.util.SharedArray;
 
 public class HorizontalSymmetry extends Symmetry {
     public HorizontalSymmetry(SharedArray sharedArray) {

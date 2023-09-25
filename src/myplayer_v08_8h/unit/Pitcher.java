@@ -1,10 +1,10 @@
-package myplayer_v08.unit;
+package myplayer_v08_8h.unit;
 
 import aic2023.user.Location;
 import aic2023.user.MapObject;
 import aic2023.user.UnitController;
 import aic2023.user.UnitType;
-import myplayer_v08.util.ExploredObject;
+import myplayer_v08_8h.util.ExploredObject;
 
 public class Pitcher extends MoveableUnit {
     public Pitcher(UnitController uc) {

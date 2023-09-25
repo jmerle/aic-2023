@@ -1,4 +1,4 @@
-package myplayer_v08.util;
+package myplayer_v08_8h.util;
 
 public class RangeData {
     public int[][] RANGE_20 = {

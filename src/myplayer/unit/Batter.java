@@ -17,51 +17,66 @@ public class Batter extends MoveableUnit {
     public void run() {
         super.run();
 
-        if (uc.canMove()) {
-            Location moveTarget = getMoveTarget();
-            if (moveTarget == null) {
-                moveTarget = sharedArray.getOpponentHQ();
-            }
-
-            if (moveTarget != null) {
-                tryMoveTo(moveTarget);
-            } else {
-                explore();
+        if (uc.canAct() && !tryBat()) {
+            if (uc.canMove()) {
+                moveAndBat();
             }
         }
 
-        if (uc.canAct()) {
-            Location myLocation = uc.getLocation();
+        if (uc.canMove()) {
+            moveToTarget();
+        }
+    }
 
-            for (Direction direction : adjacentDirections) {
-                boolean batted = false;
+    private boolean tryBat() {
+        Location myLocation = uc.getLocation();
 
-                for (int i = 1; i <= 3; i++) {
-                    Location location = myLocation.add(direction.dx * i, direction.dy * i);
-                    if (!uc.canSenseLocation(location)) {
-                        break;
-                    }
+        for (Direction direction : adjacentDirections) {
+            Location target = myLocation.add(direction);
+            if (uc.isOutOfMap(target)) {
+                continue;
+            }
 
-                    UnitInfo unit = uc.senseUnitAtLocation(location);
-                    if (unit == null) {
-                        continue;
-                    }
+            UnitInfo unit = uc.senseUnitAtLocation(target);
+            if (unit == null || unit.getTeam() == myTeam || unit.getType() == UnitType.HQ) {
+                continue;
+            }
 
-                    if (unit.getTeam() == opponentTeam && unit.getType() != UnitType.HQ) {
-                        batted = tryBat(direction, 3);
-                    }
+            if (tryBat(direction, 3)) {
+                return true;
+            }
+        }
 
-                    break;
+        return false;
+    }
+
+    private void moveAndBat() {
+        Location myLocation = uc.getLocation();
+
+        for (Direction moveDirection : adjacentDirections) {
+            if (!uc.canMove(moveDirection)) {
+                continue;
+            }
+
+            Location moveLocation = myLocation.add(moveDirection);
+
+            for (Direction batDirection : adjacentDirections) {
+                Location batLocation = moveLocation.add(batDirection);
+                if (!uc.canSenseLocation(batLocation)) {
+                    continue;
                 }
 
-                if (batted) {
-                    break;
+                UnitInfo unit = uc.senseUnitAtLocation(batLocation);
+                if (unit != null && unit.getTeam() == opponentTeam && unit.getType() != UnitType.HQ) {
+                    tryMove(moveDirection);
+                    tryBat(batDirection, 3);
+                    return;
                 }
             }
         }
     }
 
-    private Location getMoveTarget() {
+    private void moveToTarget() {
         Location bestLocation = null;
         int minDistance = Integer.MAX_VALUE;
 
@@ -91,8 +106,8 @@ public class Batter extends MoveableUnit {
             }
         }
 
-        if (bestLocation != null) {
-            return bestLocation;
+        if (bestLocation != null && tryMoveTo(bestLocation)) {
+            return;
         }
 
         for (UnitInfo unit : uc.senseUnits(me.getStat(UnitStat.VISION_RANGE), opponentTeam)) {
@@ -107,7 +122,13 @@ public class Batter extends MoveableUnit {
             }
         }
 
-        return bestLocation;
+        if (bestLocation == null) {
+            bestLocation = sharedArray.getOpponentHQ();
+        }
+
+        if (bestLocation != null) {
+            tryMoveTo(bestLocation);
+        }
     }
 
     private boolean tryBat(Direction direction, int distance) {

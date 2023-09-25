@@ -8,6 +8,9 @@ import aic2023.user.UnitInfo;
 import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 public class HQ extends Unit {
     private boolean recruitBatter = true;
 
@@ -27,20 +30,7 @@ public class HQ extends Unit {
             int centerY = sharedArray.getMinY() + sharedArray.getMapHeight() / 2;
             Location center = new Location(centerX, centerY);
 
-            boolean swapped = true;
-            while (swapped) {
-                swapped = false;
-
-                for (int i = 1; i < adjacentDirections.length; i++) {
-                    if (myHQ.add(adjacentDirections[i - 1]).distanceSquared(center) > myHQ.add(adjacentDirections[i]).distanceSquared(center)) {
-                        Direction temp = adjacentDirections[i - 1];
-                        adjacentDirections[i - 1] = adjacentDirections[i];
-                        adjacentDirections[i] = temp;
-                        swapped = true;
-                    }
-                }
-            }
-
+            Arrays.sort(adjacentDirections, Comparator.comparingInt(direction -> myHQ.add(direction).distanceSquared(center)));
             sortedRecruitDirections = true;
         }
 

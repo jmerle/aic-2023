@@ -4,6 +4,8 @@ import aic2023.user.Direction;
 import aic2023.user.Location;
 import aic2023.user.MapObject;
 import aic2023.user.UnitController;
+import aic2023.user.UnitInfo;
+import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
 import myplayer.symmetry.HorizontalSymmetry;
 import myplayer.symmetry.RotationalSymmetry;
@@ -23,6 +25,9 @@ public abstract class MoveableUnit extends Unit {
     private Location lastFollowedWall;
 
     private Location explorationTarget;
+
+    private UnitInfo[] opponentUnits = null;
+    private int opponentUnitsRound = -1;
 
     public MoveableUnit(UnitController uc, UnitType type) {
         super(uc, type);
@@ -132,6 +137,8 @@ public abstract class MoveableUnit extends Unit {
         if (!uc.canMove()) {
             return false;
         }
+
+        uc.drawLineDebug(uc.getLocation(), target, 255, 0, 0);
 
         Location myLocation = uc.getLocation();
         if (myLocation.isEqual(target)) {
@@ -244,11 +251,23 @@ public abstract class MoveableUnit extends Unit {
         }
 
         MapObject mapObject = uc.senseObjectAtLocation(location, true);
-        if (mapObject == MapObject.BALL && me == UnitType.CATCHER) {
-            return true;
+        if (mapObject == MapObject.WATER || (mapObject == MapObject.BALL && me != UnitType.CATCHER)) {
+            return false;
         }
 
-        return mapObject != MapObject.WATER && mapObject != MapObject.BALL;
+        int round = uc.getRound();
+        if (opponentUnitsRound != round) {
+            opponentUnits = uc.senseUnits(me.getStat(UnitStat.VISION_RANGE), opponentTeam);
+            opponentUnitsRound = round;
+        }
+
+        for (UnitInfo unit : opponentUnits) {
+            if (unit.getType() == UnitType.BATTER && unit.getLocation().distanceSquared(location) <= 8) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     protected boolean tryMoveRandom() {
@@ -267,6 +286,7 @@ public abstract class MoveableUnit extends Unit {
 
     protected boolean tryMove(Direction direction) {
         if (uc.canMove(direction)) {
+            uc.drawLineDebug(uc.getLocation(), uc.getLocation().add(direction), 0, 255, 0);
             uc.move(direction);
             return true;
         }

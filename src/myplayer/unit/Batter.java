@@ -26,6 +26,10 @@ public class Batter extends MoveableUnit {
         if (uc.canMove()) {
             moveToTarget();
         }
+
+        if (uc.canMove()) {
+            explore();
+        }
     }
 
     private boolean tryBat() {

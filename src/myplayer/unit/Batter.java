@@ -2,6 +2,7 @@ package myplayer.unit;
 
 import aic2023.user.Direction;
 import aic2023.user.Location;
+import aic2023.user.MapObject;
 import aic2023.user.UnitController;
 import aic2023.user.UnitInfo;
 import aic2023.user.UnitStat;
@@ -21,6 +22,10 @@ public class Batter extends MoveableUnit {
             if (uc.canMove()) {
                 moveAndBat();
             }
+        }
+
+        if (uc.canAct() && sharedArray.getOpponentHQ() != null) {
+            batFriendly();
         }
 
         if (uc.canMove()) {
@@ -145,6 +150,50 @@ public class Batter extends MoveableUnit {
 
         if (bestLocation != null) {
             tryMoveTo(bestLocation);
+        }
+    }
+
+    private void batFriendly() {
+        Location myLocation = uc.getLocation();
+        Location opponentHQ = sharedArray.getOpponentHQ();
+
+        outer:
+        for (Direction batDirection : adjacentDirections) {
+            int batDistance = batDirection.dx == 0 || batDirection.dy == 0 ? 3 : 2;
+
+            Location batLocation = myLocation.add(batDirection);
+            Location targetLocation = batLocation.add(batDirection.dx * batDistance, batDirection.dy * batDistance);
+            if (uc.isOutOfMap(batLocation)
+                || uc.isOutOfMap(targetLocation)
+                || batLocation.distanceSquared(opponentHQ) < targetLocation.distanceSquared(opponentHQ)) {
+                continue;
+            }
+
+            UnitInfo batUnit = uc.senseUnitAtLocation(batLocation);
+            if (batUnit == null
+                || batUnit.getTeam() != myTeam
+                || batUnit.getType() != UnitType.BATTER
+                || !uc.canSchedule(batUnit.getID())) {
+                continue;
+            }
+
+            for (int i = 1; i <= batDistance; i++) {
+                Location hitLocation = batLocation.add(batDirection.dx * i, batDirection.dy * i);
+
+                MapObject hitObject = uc.senseObjectAtLocation(hitLocation, true);
+                if (hitObject == MapObject.WATER || hitObject == MapObject.BALL) {
+                    continue outer;
+                }
+
+                UnitInfo hitUnit = uc.senseUnitAtLocation(hitLocation);
+                if (hitUnit != null && (hitUnit.getTeam() == myTeam || hitUnit.getType() == UnitType.HQ)) {
+                    continue outer;
+                }
+            }
+
+            if (tryBat(batDirection, batDistance)) {
+                return;
+            }
         }
     }
 

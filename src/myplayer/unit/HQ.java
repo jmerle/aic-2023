@@ -7,6 +7,9 @@ import aic2023.user.UnitController;
 import aic2023.user.UnitInfo;
 import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
+import myplayer.symmetry.Symmetry;
+import myplayer.util.ExploredObject;
+import myplayer.util.ExploredTiles;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -32,6 +35,25 @@ public class HQ extends Unit {
 
             Arrays.sort(adjacentDirections, Comparator.comparingInt(direction -> myHQ.add(direction).distanceSquared(center)));
             sortedRecruitDirections = true;
+        }
+
+        if (uc.getRound() - spawnRound > 2 && hasSymmetry() && sharedArray.hasExploredTiles()) {
+            Symmetry symmetry = getSymmetry();
+            ExploredTiles exploredTiles = sharedArray.getExploredTiles();
+
+            for (ExploredObject object : sharedArray.getExploredBases()) {
+                Location reflected = symmetry.reflect(object.location);
+                if (!exploredTiles.isExplored(reflected)) {
+                    sharedArray.setExploredBase(reflected, sharedArray.OCCUPATION_EMPTY);
+                }
+            }
+
+            for (ExploredObject object : sharedArray.getExploredStadiums()) {
+                Location reflected = symmetry.reflect(object.location);
+                if (!exploredTiles.isExplored(reflected)) {
+                    sharedArray.setExploredStadium(reflected, sharedArray.OCCUPATION_EMPTY);
+                }
+            }
         }
 
         boolean danger = false;

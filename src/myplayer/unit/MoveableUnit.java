@@ -138,8 +138,6 @@ public abstract class MoveableUnit extends Unit {
             return false;
         }
 
-        uc.drawLineDebug(uc.getLocation(), target, 255, 0, 0);
-
         Location myLocation = uc.getLocation();
         if (myLocation.isEqual(target)) {
             return false;
@@ -286,7 +284,6 @@ public abstract class MoveableUnit extends Unit {
 
     protected boolean tryMove(Direction direction) {
         if (uc.canMove(direction)) {
-            uc.drawLineDebug(uc.getLocation(), uc.getLocation().add(direction), 0, 255, 0);
             uc.move(direction);
             return true;
         }

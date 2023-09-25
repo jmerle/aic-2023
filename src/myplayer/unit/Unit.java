@@ -12,7 +12,6 @@ import myplayer.symmetry.HorizontalSymmetry;
 import myplayer.symmetry.RotationalSymmetry;
 import myplayer.symmetry.Symmetry;
 import myplayer.symmetry.VerticalSymmetry;
-import myplayer.util.ExploredObject;
 import myplayer.util.ExploredTiles;
 import myplayer.util.SharedArray;
 
@@ -38,10 +37,10 @@ public abstract class Unit {
     };
 
     protected Location myHQ;
+    protected int spawnRound = -1;
 
     private Symmetry symmetry;
 
-    private int startRound = -1;
     private boolean sharedFullExploredData;
     private Location previousExploreLocation;
 
@@ -73,8 +72,8 @@ public abstract class Unit {
             }
         }
 
-        if (startRound == -1) {
-            startRound = uc.getRound();
+        if (spawnRound == -1) {
+            spawnRound = uc.getRound();
         }
 
         if (sharedArray.getOpponentHQ() == null) {
@@ -150,11 +149,10 @@ public abstract class Unit {
             sharedArray.setExploredStadium(location, getOccupation(location));
         }
 
-        if (uc.getRound() == startRound) {
+        if (uc.getRound() == spawnRound) {
             return;
         }
 
-        boolean exploredFull = false;
         if (sharedArray.hasExploredTiles() && !uc.getLocation().isEqual(previousExploreLocation)) {
             ExploredTiles exploredTiles = sharedArray.getExploredTiles();
 
@@ -163,37 +161,11 @@ public abstract class Unit {
 
             if (width == -1 || height == -1 || exploredTiles.countExplored() < width * height) {
                 exploredTiles.markExplored(!sharedFullExploredData);
-
-                exploredFull = !sharedFullExploredData;
                 sharedFullExploredData = true;
-
                 sharedArray.setExploredTiles(exploredTiles);
             }
 
             previousExploreLocation = uc.getLocation();
-        }
-
-        if (exploredFull) {
-            return;
-        }
-
-        Symmetry currentSymmetry = hasSymmetry() ? getSymmetry() : null;
-        ExploredTiles exploredTiles = sharedArray.hasExploredTiles() ? sharedArray.getExploredTiles() : null;
-
-        if (currentSymmetry != null && exploredTiles != null) {
-            for (ExploredObject object : sharedArray.getExploredBases()) {
-                Location reflected = currentSymmetry.reflect(object.location);
-                if (!exploredTiles.isExplored(reflected)) {
-                    sharedArray.setExploredBase(reflected, sharedArray.OCCUPATION_EMPTY);
-                }
-            }
-
-            for (ExploredObject object : sharedArray.getExploredStadiums()) {
-                Location reflected = currentSymmetry.reflect(object.location);
-                if (!exploredTiles.isExplored(reflected)) {
-                    sharedArray.setExploredStadium(reflected, sharedArray.OCCUPATION_EMPTY);
-                }
-            }
         }
     }
 

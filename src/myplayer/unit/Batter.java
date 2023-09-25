@@ -55,6 +55,18 @@ public class Batter extends MoveableUnit {
     }
 
     private void moveAndBat() {
+        boolean targetExists = false;
+        for (UnitInfo unit : uc.senseUnits(8, opponentTeam)) {
+            if (unit.getType() == UnitType.BATTER) {
+                targetExists = true;
+                break;
+            }
+        }
+
+        if (!targetExists) {
+            return;
+        }
+
         Location myLocation = uc.getLocation();
 
         for (Direction moveDirection : adjacentDirections) {
@@ -66,7 +78,7 @@ public class Batter extends MoveableUnit {
 
             for (Direction batDirection : adjacentDirections) {
                 Location batLocation = moveLocation.add(batDirection);
-                if (!uc.canSenseLocation(batLocation)) {
+                if (uc.isOutOfMap(batLocation)) {
                     continue;
                 }
 
@@ -110,7 +122,8 @@ public class Batter extends MoveableUnit {
             }
         }
 
-        if (bestLocation != null && tryMoveTo(bestLocation)) {
+        if (bestLocation != null) {
+            tryMoveTo(bestLocation);
             return;
         }
 

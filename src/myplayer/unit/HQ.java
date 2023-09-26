@@ -35,7 +35,7 @@ public class HQ extends Unit {
             sortedRecruitDirections = true;
         }
 
-        if (uc.getRound() - spawnRound > 2 && hasSymmetry()) {
+        if (hasSymmetry()) {
             Symmetry symmetry = getSymmetry();
 
             for (ExploredObject object : sharedArray.getExploredBases()) {

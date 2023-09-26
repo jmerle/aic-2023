@@ -1,13 +1,13 @@
 package myplayer.util;
 
+import aic2023.user.GameConstants;
 import aic2023.user.Location;
 import aic2023.user.UnitController;
 import aic2023.user.UnitStat;
 
 public class ExploredTiles {
     private UnitController uc;
-
-    public long[] rows;
+    private SharedArray sharedArray;
 
     private int xOffset;
     private boolean xOffsetSubtract;
@@ -15,9 +15,9 @@ public class ExploredTiles {
     private int yOffset;
     private boolean yOffsetSubtract;
 
-    public ExploredTiles(UnitController uc, long[] rows, int xOffset, boolean xOffsetSubtract, int yOffset, boolean yOffsetSubtract) {
+    public ExploredTiles(UnitController uc, SharedArray sharedArray, int xOffset, boolean xOffsetSubtract, int yOffset, boolean yOffsetSubtract) {
         this.uc = uc;
-        this.rows = rows;
+        this.sharedArray = sharedArray;
         this.xOffset = xOffset;
         this.xOffsetSubtract = xOffsetSubtract;
         this.yOffset = yOffset;
@@ -27,17 +27,7 @@ public class ExploredTiles {
     public boolean isExplored(Location location) {
         int x = xOffsetSubtract ? xOffset - location.x : location.x - xOffset;
         int y = yOffsetSubtract ? yOffset - location.y : location.y - yOffset;
-        return (rows[y] & (1L << x)) != 0;
-    }
-
-    public int countExplored() {
-        int count = 0;
-
-        for (long row : rows) {
-            count += Long.bitCount(row);
-        }
-
-        return count;
+        return uc.read(sharedArray.INDEX_UNEXPLORED_OFFSET + y * GameConstants.MAX_MAP_SIZE + x) == 1;
     }
 
     public void markExplored(boolean full) {
@@ -68,10521 +58,10052 @@ public class ExploredTiles {
 
     private void markExploredFull20() {
         Location myLocation = uc.getLocation();
-        Location location;
+        int myX = myLocation.x;
+        int myY = myLocation.y;
+        int height = GameConstants.MAX_MAP_SIZE;
+        int maxIndex = GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE;
+        int writeOffset = sharedArray.INDEX_UNEXPLORED_OFFSET;
+        int index;
 
         if (xOffsetSubtract && yOffsetSubtract) {
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else if (xOffsetSubtract) {
-
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(0, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(0, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(0, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else if (yOffsetSubtract) {
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else {
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         }
     }
 
     private void markExploredPartial20() {
         Location myLocation = uc.getLocation();
-        Location location;
+        int myX = myLocation.x;
+        int myY = myLocation.y;
+        int height = GameConstants.MAX_MAP_SIZE;
+        int maxIndex = GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE;
+        int writeOffset = sharedArray.INDEX_UNEXPLORED_OFFSET;
+        int index;
 
         if (xOffsetSubtract && yOffsetSubtract) {
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else if (xOffsetSubtract) {
-
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else if (yOffsetSubtract) {
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else {
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         }
     }
 
     private void markExploredFull32() {
         Location myLocation = uc.getLocation();
-        Location location;
+        int myX = myLocation.x;
+        int myY = myLocation.y;
+        int height = GameConstants.MAX_MAP_SIZE;
+        int maxIndex = GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE;
+        int writeOffset = sharedArray.INDEX_UNEXPLORED_OFFSET;
+        int index;
 
         if (xOffsetSubtract && yOffsetSubtract) {
-            location = myLocation.add(-2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else if (xOffsetSubtract) {
-
-            location = myLocation.add(-2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(0, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(0, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(0, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(0, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(0, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else if (yOffsetSubtract) {
-            location = myLocation.add(-2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else {
-            location = myLocation.add(-2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         }
     }
 
     private void markExploredPartial32() {
         Location myLocation = uc.getLocation();
-        Location location;
+        int myX = myLocation.x;
+        int myY = myLocation.y;
+        int height = GameConstants.MAX_MAP_SIZE;
+        int maxIndex = GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE;
+        int writeOffset = sharedArray.INDEX_UNEXPLORED_OFFSET;
+        int index;
 
         if (xOffsetSubtract && yOffsetSubtract) {
-            location = myLocation.add(-2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else if (xOffsetSubtract) {
-
-            location = myLocation.add(-2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else if (yOffsetSubtract) {
-            location = myLocation.add(-2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else {
-            location = myLocation.add(-2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         }
     }
 
     private void markExploredFull64() {
         Location myLocation = uc.getLocation();
-        Location location;
+        int myX = myLocation.x;
+        int myY = myLocation.y;
+        int height = GameConstants.MAX_MAP_SIZE;
+        int maxIndex = GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE;
+        int writeOffset = sharedArray.INDEX_UNEXPLORED_OFFSET;
+        int index;
 
         if (xOffsetSubtract && yOffsetSubtract) {
-            location = myLocation.add(0, -8);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 8)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 7)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 7)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 7)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 7)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 7)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 7)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 7)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-8, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 8));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(8, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 8));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 7)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 7)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 7)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 7)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 7)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 7)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 7)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 8);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 8)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else if (xOffsetSubtract) {
-
-            location = myLocation.add(0, -8);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 8) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 7) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-2, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 7) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 7) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 7) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(1, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 7) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 7) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 7) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-5, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-2, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(1, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(4, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-6, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-5, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(4, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(6, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-6, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(0, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(6, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-7, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-6, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(5, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(6, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(7, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-7, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-6, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(6, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(7, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-7, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-6, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(6, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(7, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-8, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 8));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-7, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-6, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(6, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(7, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(8, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 8));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-7, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-6, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(6, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(7, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-7, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-6, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(6, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(7, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-7, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-6, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-5, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(0, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(5, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(6, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(7, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-6, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(0, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(6, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-6, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-4, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(0, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(3, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(6, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-3, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(0, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(3, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(-3, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 7) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 7) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 7) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(0, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 7) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 7) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(2, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 7) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 7) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
-
 
-            location = myLocation.add(0, 8);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 8) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else if (yOffsetSubtract) {
-            location = myLocation.add(0, -8);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 8)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 7)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 7)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 7)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 7)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 7)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 7)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 7)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-8, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 8) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(8, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 8) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 7)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 7)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 7)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 7)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 7)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 7)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 7)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 8);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 8)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else {
-            location = myLocation.add(0, -8);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 8) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 7) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 7) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 7) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 7) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 7) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 7) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 7) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-8, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 8) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(8, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 8) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 7) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 7) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 7) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 7) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 7) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 7) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 7) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 8);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 8) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         }
     }
 
     private void markExploredPartial64() {
         Location myLocation = uc.getLocation();
-        Location location;
+        int myX = myLocation.x;
+        int myY = myLocation.y;
+        int height = GameConstants.MAX_MAP_SIZE;
+        int maxIndex = GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE;
+        int writeOffset = sharedArray.INDEX_UNEXPLORED_OFFSET;
+        int index;
 
         if (xOffsetSubtract && yOffsetSubtract) {
-            location = myLocation.add(0, -8);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 8)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 7)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 7)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 7)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 7)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 7)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 7)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 7)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 6)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 5)) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 4)) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 3)) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 2)) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY - 1)) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-8, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 8));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(8, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - myY) * height + (xOffset - (myX + 8));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 1)) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 2)) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 3)) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 4)) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 5)) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 6)) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 7)) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 7)) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 7)) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 7)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 7)) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 7)) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 7)) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 8);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (xOffset - location.x);
+            index = (yOffset - (myY + 8)) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else if (xOffsetSubtract) {
-
-            location = myLocation.add(0, -8);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 8) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 7) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 7) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 7) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 7) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 7) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 7) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 7) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 6) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-6, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(6, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 5) - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-6, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(6, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 4) - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-7, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-6, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(6, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(7, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 3) - yOffset) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-7, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(7, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 2) - yOffset) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-7, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(7, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY - 1) - yOffset) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-8, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 8));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-7, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(7, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(8, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = (myY - yOffset) * height + (xOffset - (myX + 8));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-7, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(7, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 1) - yOffset) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-7, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(7, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 2) - yOffset) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-7, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-6, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(6, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(7, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 3) - yOffset) * height + (xOffset - (myX + 7));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-6, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(6, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 4) - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-6, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX - 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(6, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 5) - yOffset) * height + (xOffset - (myX + 6));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-5, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - (myX - 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-4, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - (myX - 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(4, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - (myX + 4));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(5, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 6) - yOffset) * height + (xOffset - (myX + 5));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-3, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 7) - yOffset) * height + (xOffset - (myX - 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-2, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 7) - yOffset) * height + (xOffset - (myX - 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(-1, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 7) - yOffset) * height + (xOffset - (myX - 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 7) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(1, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 7) - yOffset) * height + (xOffset - (myX + 1));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(2, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 7) - yOffset) * height + (xOffset - (myX + 2));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(3, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 7) - yOffset) * height + (xOffset - (myX + 3));
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-
-            location = myLocation.add(0, 8);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (xOffset - location.x);
+            index = ((myY + 8) - yOffset) * height + (xOffset - myX);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else if (yOffsetSubtract) {
-            location = myLocation.add(0, -8);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 8)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 7)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 7)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 7)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 7)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 7)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 7)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 7)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 6)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 5)) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 4)) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 3)) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 2)) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY - 1)) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-8, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 8) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(8, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - myY) * height + ((myX + 8) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 1)) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 2)) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 3)) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 4)) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 5)) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 6)) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 7)) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 7)) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 7)) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 7)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 7)) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 7)) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 7)) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 8);
-            if (!uc.isOutOfMap(location)) {
-                rows[yOffset - location.y] |= 1L << (location.x - xOffset);
+            index = (yOffset - (myY + 8)) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         } else {
-            location = myLocation.add(0, -8);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 8) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 7) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 7) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 7) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 7) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 7) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 7) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 7) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 6) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 5) - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 4) - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 3) - yOffset) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 2) - yOffset) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, -1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY - 1) - yOffset) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-8, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 8) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(8, 0);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = (myY - yOffset) * height + ((myX + 8) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 1);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 1) - yOffset) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 2);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 2) - yOffset) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-7, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(7, 3);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 3) - yOffset) * height + ((myX + 7) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 4);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 4) - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-6, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX - 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(6, 5);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 5) - yOffset) * height + ((myX + 6) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-5, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + ((myX - 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-4, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + ((myX - 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(4, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + ((myX + 4) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(5, 6);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 6) - yOffset) * height + ((myX + 5) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-3, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 7) - yOffset) * height + ((myX - 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-2, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 7) - yOffset) * height + ((myX - 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(-1, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 7) - yOffset) * height + ((myX - 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 7) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(1, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 7) - yOffset) * height + ((myX + 1) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(2, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 7) - yOffset) * height + ((myX + 2) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(3, 7);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 7) - yOffset) * height + ((myX + 3) - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
 
-            location = myLocation.add(0, 8);
-            if (!uc.isOutOfMap(location)) {
-                rows[location.y - yOffset] |= 1L << (location.x - xOffset);
+            index = ((myY + 8) - yOffset) * height + (myX - xOffset);
+            if (index >= 0 && index < maxIndex) {
+                uc.write(writeOffset + index, 1);
             }
         }
     }

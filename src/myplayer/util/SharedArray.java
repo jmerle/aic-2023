@@ -20,7 +20,7 @@ public class SharedArray {
     private int INDEX_STADIUMS_OFFSET = INDEX_STADIUMS_COUNT + 1;
     private int INDEX_UNEXPLORED_USE_MIN_X = INDEX_STADIUMS_OFFSET + (GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE) * 2 + 1;
     private int INDEX_UNEXPLORED_USE_MIN_Y = INDEX_UNEXPLORED_USE_MIN_X + 1;
-    private int INDEX_UNEXPLORED_OFFSET = INDEX_UNEXPLORED_USE_MIN_Y + 1;
+    public int INDEX_UNEXPLORED_OFFSET = INDEX_UNEXPLORED_USE_MIN_Y + 1;
 
     public int OCCUPATION_EMPTY = 0;
     public int OCCUPATION_ME = 1;
@@ -133,14 +133,6 @@ public class SharedArray {
     }
 
     public ExploredTiles getExploredTiles() {
-        int rowCount = hasMapHeight() ? getMapHeight() : GameConstants.MAX_MAP_SIZE;
-
-        long[] rows = new long[rowCount];
-        for (int i = rowCount; --i >= 0; ) {
-            int index = INDEX_UNEXPLORED_OFFSET + i * 2;
-            rows[i] = (((long) uc.read(index)) << 32) | (uc.read(index + 1) & 0xffffffffL);
-        }
-
         int useMinXValue = uc.read(INDEX_UNEXPLORED_USE_MIN_X);
         boolean useMinX;
         if (useMinXValue == 0) {
@@ -165,14 +157,7 @@ public class SharedArray {
         int yOffset = useMinY ? getMinY() : getMaxY();
         boolean yOffsetSubtract = !useMinY;
 
-        return new ExploredTiles(uc, rows, xOffset, xOffsetSubtract, yOffset, yOffsetSubtract);
-    }
-
-    public void setExploredTiles(ExploredTiles tiles) {
-        for (int i = tiles.rows.length; --i >= 0; ) {
-            uc.write(INDEX_UNEXPLORED_OFFSET + i * 2, (int) (tiles.rows[i] >> 32));
-            uc.write(INDEX_UNEXPLORED_OFFSET + i * 2 + 1, (int) tiles.rows[i]);
-        }
+        return new ExploredTiles(uc, this, xOffset, xOffsetSubtract, yOffset, yOffsetSubtract);
     }
 
     private ExploredObject[] getExploredObjects(int indexCount, int indexOffset) {

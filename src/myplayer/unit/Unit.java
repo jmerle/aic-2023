@@ -38,7 +38,6 @@ public abstract class Unit {
     };
 
     protected Location myHQ;
-    protected int spawnRound = -1;
 
     private Symmetry symmetry;
 
@@ -71,10 +70,6 @@ public abstract class Unit {
                     }
                 }
             }
-        }
-
-        if (spawnRound == -1) {
-            spawnRound = uc.getRound();
         }
 
         if (sharedArray.getOpponentHQ() == null) {
@@ -152,23 +147,10 @@ public abstract class Unit {
 
         if (sharedArray.hasExploredTiles()) {
             exploredTiles = sharedArray.getExploredTiles();
-        }
 
-        if (uc.getRound() == spawnRound) {
-            return;
-        }
-
-        if (sharedArray.hasExploredTiles()) {
             if (!uc.getLocation().isEqual(previousExploreLocation)) {
-                int width = sharedArray.hasMapWidth() ? sharedArray.getMapWidth() : -1;
-                int height = sharedArray.hasMapHeight() ? sharedArray.getMapHeight() : -1;
-
-                if (width == -1 || height == -1 || exploredTiles.countExplored() < width * height) {
-                    exploredTiles.markExplored(!sharedFullExploredData);
-                    sharedFullExploredData = true;
-                    sharedArray.setExploredTiles(exploredTiles);
-                }
-
+                exploredTiles.markExplored(!sharedFullExploredData);
+                sharedFullExploredData = true;
                 previousExploreLocation = uc.getLocation();
             }
         }

@@ -1,16 +1,29 @@
+def offset_to_string(variable: str, offset: int) -> str:
+    if offset == 0:
+        return variable
+    elif offset > 0:
+        return f"({variable} + {offset})"
+    else:
+        return f"({variable} - {abs(offset)})"
+
 def generate_method(name: str, offsets: list[tuple[int, int]]) -> None:
     print(f"private void {name}() {{")
     print("Location myLocation = uc.getLocation();")
-    print("Location location;")
+    print("int myX = myLocation.x;")
+    print("int myY = myLocation.y;")
+    print("int height = GameConstants.MAX_MAP_SIZE;")
+    print("int maxIndex = GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE;")
+    print("int writeOffset = sharedArray.INDEX_UNEXPLORED_OFFSET;")
+    print("int index;")
     print("\nif (xOffsetSubtract && yOffsetSubtract) {")
 
     for i, (dx, dy) in enumerate(offsets):
         if i > 0:
             print()
 
-        print(f"location = myLocation.add({dx}, {dy});")
-        print("if (!uc.isOutOfMap(location)) {")
-        print("rows[yOffset - location.y] |= 1L << (xOffset - location.x);")
+        print(f"index = (yOffset - {offset_to_string('myY', dy)}) * height + (xOffset - {offset_to_string('myX', dx)});")
+        print("if (index >= 0 && index < maxIndex) {")
+        print("uc.write(writeOffset + index, 1);")
         print("}")
 
     print("} else if (xOffsetSubtract) {")
@@ -19,9 +32,9 @@ def generate_method(name: str, offsets: list[tuple[int, int]]) -> None:
         if i > 0:
             print()
 
-        print(f"\nlocation = myLocation.add({dx}, {dy});")
-        print("if (!uc.isOutOfMap(location)) {")
-        print("rows[location.y - yOffset] |= 1L << (xOffset - location.x);")
+        print(f"index = ({offset_to_string('myY', dy)} - yOffset) * height + (xOffset - {offset_to_string('myX', dx)});")
+        print("if (index >= 0 && index < maxIndex) {")
+        print("uc.write(writeOffset + index, 1);")
         print("}")
 
     print("} else if (yOffsetSubtract) {")
@@ -30,9 +43,9 @@ def generate_method(name: str, offsets: list[tuple[int, int]]) -> None:
         if i > 0:
             print()
 
-        print(f"location = myLocation.add({dx}, {dy});")
-        print("if (!uc.isOutOfMap(location)) {")
-        print("rows[yOffset - location.y] |= 1L << (location.x - xOffset);")
+        print(f"index = (yOffset - {offset_to_string('myY', dy)}) * height + ({offset_to_string('myX', dx)} - xOffset);")
+        print("if (index >= 0 && index < maxIndex) {")
+        print("uc.write(writeOffset + index, 1);")
         print("}")
 
     print("} else {")
@@ -41,9 +54,9 @@ def generate_method(name: str, offsets: list[tuple[int, int]]) -> None:
         if i > 0:
             print()
 
-        print(f"location = myLocation.add({dx}, {dy});")
-        print("if (!uc.isOutOfMap(location)) {")
-        print("rows[location.y - yOffset] |= 1L << (location.x - xOffset);")
+        print(f"index = ({offset_to_string('myY', dy)} - yOffset) * height + ({offset_to_string('myX', dx)} - xOffset);")
+        print("if (index >= 0 && index < maxIndex) {")
+        print("uc.write(writeOffset + index, 1);")
         print("}")
 
     print("}")

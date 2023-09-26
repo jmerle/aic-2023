@@ -77,54 +77,39 @@ public abstract class MoveableUnit extends Unit {
         boolean hasMinY = sharedArray.hasMinY();
         boolean hasMaxY = sharedArray.hasMaxY();
 
-        Direction direction = null;
-        if (!hasMinX) {
-            direction = Direction.WEST;
-        } else if (!hasMaxX) {
-            direction = Direction.EAST;
-        } else if (!hasMinY) {
-            direction = Direction.SOUTH;
-        } else if (!hasMaxY) {
-            direction = Direction.NORTH;
-        }
+        List<Direction> directions = new ArrayList<>();
 
-        if (uc.getInfo().getID() % 2 == 0) {
-            if (!hasMinX && !hasMinY) {
-                direction = Direction.SOUTHWEST;
-            } else if (!hasMinX && !hasMaxY) {
-                direction = Direction.NORTHWEST;
-            } else if (!hasMaxX && !hasMaxY) {
-                direction = Direction.NORTHEAST;
-            } else if (!hasMaxX && !hasMinY) {
-                direction = Direction.SOUTHEAST;
-            }
-        }
+        if (!hasMinX) directions.add(Direction.WEST);
+        if (!hasMaxX) directions.add(Direction.EAST);
+        if (!hasMinY) directions.add(Direction.SOUTH);
+        if (!hasMaxY) directions.add(Direction.NORTH);
+        if (!hasMinX && !hasMinY) directions.add(Direction.SOUTHWEST);
+        if (!hasMinX && !hasMaxY) directions.add(Direction.NORTHWEST);
+        if (!hasMaxX && !hasMaxY) directions.add(Direction.NORTHEAST);
+        if (!hasMaxX && !hasMinY) directions.add(Direction.SOUTHEAST);
 
+        Direction direction = directions.get(uc.getInfo().getID() % directions.size());
         moveTo(myHQ.add(direction.dx * 100, direction.dy * 100));
     }
 
     private boolean tryFindOpponentHQ() {
         List<Location> options = new ArrayList<>();
 
-        for (Symmetry symmetry : new Symmetry[]{
-            new RotationalSymmetry(sharedArray),
-            new HorizontalSymmetry(sharedArray),
-            new VerticalSymmetry(sharedArray)
-        }) {
-            Location option = symmetry.reflect(myHQ);
-            if (!exploredTiles.isExplored(option)) {
-                options.add(option);
-            }
-        }
+        Location option = new RotationalSymmetry(sharedArray).reflect(myHQ);
+        if (!exploredTiles.isExplored(option)) options.add(option);
 
-        Location firstOption = options.get(0);
+        option = new HorizontalSymmetry(sharedArray).reflect(myHQ);
+        if (!exploredTiles.isExplored(option)) options.add(option);
+
+        option = new VerticalSymmetry(sharedArray).reflect(myHQ);
+        if (!exploredTiles.isExplored(option)) options.add(option);
 
         if (options.size() == 1) {
-            sharedArray.setOpponentHQ(firstOption);
+            sharedArray.setOpponentHQ(options.get(0));
             return false;
         }
 
-        moveTo(firstOption);
+        moveTo(options.get(uc.getInfo().getID() % options.size()));
         return true;
     }
 

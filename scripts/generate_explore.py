@@ -22,9 +22,7 @@ def generate_method(name: str, offsets: list[tuple[int, int]]) -> None:
             print()
 
         print(f"index = (yOffset - {offset_to_string('myY', dy)}) * height + (xOffset - {offset_to_string('myX', dx)});")
-        print("if (index >= 0 && index < maxIndex) {")
-        print("uc.write(writeOffset + index, 1);")
-        print("}")
+        print("if (index >= 0 && index < maxIndex) uc.write(writeOffset + index, 1);")
 
     print("} else if (xOffsetSubtract) {")
 
@@ -33,9 +31,7 @@ def generate_method(name: str, offsets: list[tuple[int, int]]) -> None:
             print()
 
         print(f"index = ({offset_to_string('myY', dy)} - yOffset) * height + (xOffset - {offset_to_string('myX', dx)});")
-        print("if (index >= 0 && index < maxIndex) {")
-        print("uc.write(writeOffset + index, 1);")
-        print("}")
+        print("if (index >= 0 && index < maxIndex) uc.write(writeOffset + index, 1);")
 
     print("} else if (yOffsetSubtract) {")
 
@@ -44,9 +40,7 @@ def generate_method(name: str, offsets: list[tuple[int, int]]) -> None:
             print()
 
         print(f"index = (yOffset - {offset_to_string('myY', dy)}) * height + ({offset_to_string('myX', dx)} - xOffset);")
-        print("if (index >= 0 && index < maxIndex) {")
-        print("uc.write(writeOffset + index, 1);")
-        print("}")
+        print("if (index >= 0 && index < maxIndex) uc.write(writeOffset + index, 1);")
 
     print("} else {")
 
@@ -55,9 +49,7 @@ def generate_method(name: str, offsets: list[tuple[int, int]]) -> None:
             print()
 
         print(f"index = ({offset_to_string('myY', dy)} - yOffset) * height + ({offset_to_string('myX', dx)} - xOffset);")
-        print("if (index >= 0 && index < maxIndex) {")
-        print("uc.write(writeOffset + index, 1);")
-        print("}")
+        print("if (index >= 0 && index < maxIndex) uc.write(writeOffset + index, 1);")
 
     print("}")
     print("}")

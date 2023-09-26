@@ -8,7 +8,6 @@ import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
 import myplayer.symmetry.Symmetry;
 import myplayer.util.ExploredObject;
-import myplayer.util.ExploredTiles;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -36,7 +35,7 @@ public class HQ extends Unit {
             sortedRecruitDirections = true;
         }
 
-        if (uc.getRound() - spawnRound > 2 && hasSymmetry() && exploredTiles != null) {
+        if (uc.getRound() - spawnRound > 2 && hasSymmetry()) {
             Symmetry symmetry = getSymmetry();
 
             for (ExploredObject object : sharedArray.getExploredBases()) {

@@ -104,10 +104,6 @@ public abstract class MoveableUnit extends Unit {
     }
 
     private boolean tryFindOpponentHQ() {
-        if (exploredTiles == null) {
-            return true;
-        }
-
         List<Location> options = new ArrayList<>();
 
         for (Symmetry symmetry : new Symmetry[]{

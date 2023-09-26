@@ -150,13 +150,15 @@ public abstract class Unit {
             sharedArray.setExploredStadium(location, getOccupation(location));
         }
 
+        if (sharedArray.hasExploredTiles()) {
+            exploredTiles = sharedArray.getExploredTiles();
+        }
+
         if (uc.getRound() == spawnRound) {
             return;
         }
 
         if (sharedArray.hasExploredTiles()) {
-            exploredTiles = sharedArray.getExploredTiles();
-
             if (!uc.getLocation().isEqual(previousExploreLocation)) {
                 int width = sharedArray.hasMapWidth() ? sharedArray.getMapWidth() : -1;
                 int height = sharedArray.hasMapHeight() ? sharedArray.getMapHeight() : -1;

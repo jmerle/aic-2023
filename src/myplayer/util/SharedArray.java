@@ -5,22 +5,24 @@ import aic2023.user.Location;
 import aic2023.user.UnitController;
 
 public class SharedArray {
-    private int INDEX_OPPONENT_HQ = 0;
-    private int INDEX_HAS_MIN_X = INDEX_OPPONENT_HQ + 1;
-    private int INDEX_MIN_X = INDEX_HAS_MIN_X + 1;
-    private int INDEX_HAS_MAX_X = INDEX_MIN_X + 1;
-    private int INDEX_MAX_X = INDEX_HAS_MAX_X + 1;
-    private int INDEX_HAS_MIN_Y = INDEX_MAX_X + 1;
-    private int INDEX_MIN_Y = INDEX_HAS_MIN_Y + 1;
-    private int INDEX_HAS_MAX_Y = INDEX_MIN_Y + 1;
-    private int INDEX_MAX_Y = INDEX_HAS_MAX_Y + 1;
-    private int INDEX_BASES_COUNT = INDEX_MAX_Y + 1;
-    private int INDEX_BASES_OFFSET = INDEX_BASES_COUNT + 1;
-    private int INDEX_STADIUMS_COUNT = INDEX_BASES_OFFSET + (GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE) * 2 + 1;
-    private int INDEX_STADIUMS_OFFSET = INDEX_STADIUMS_COUNT + 1;
-    private int INDEX_UNEXPLORED_USE_MIN_X = INDEX_STADIUMS_OFFSET + (GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE) * 2 + 1;
-    private int INDEX_UNEXPLORED_USE_MIN_Y = INDEX_UNEXPLORED_USE_MIN_X + 1;
-    public int INDEX_UNEXPLORED_OFFSET = INDEX_UNEXPLORED_USE_MIN_Y + 1;
+    private int nextIndex = 0;
+
+    private int INDEX_OPPONENT_HQ = allocate(1);
+    private int INDEX_HAS_MIN_X = allocate(1);
+    private int INDEX_MIN_X = allocate(1);
+    private int INDEX_HAS_MAX_X = allocate(1);
+    private int INDEX_MAX_X = allocate(1);
+    private int INDEX_HAS_MIN_Y = allocate(1);
+    private int INDEX_MIN_Y = allocate(1);
+    private int INDEX_HAS_MAX_Y = allocate(1);
+    private int INDEX_MAX_Y = allocate(1);
+    private int INDEX_BASES_COUNT = allocate(1);
+    private int INDEX_BASES_OFFSET = allocate(GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE * 2);
+    private int INDEX_STADIUMS_COUNT = allocate(1);
+    private int INDEX_STADIUMS_OFFSET = allocate(GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE * 2);
+    private int INDEX_UNEXPLORED_USE_MIN_X = allocate(1);
+    private int INDEX_UNEXPLORED_USE_MIN_Y = allocate(1);
+    public int INDEX_UNEXPLORED_OFFSET = allocate(GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE);
 
     public int OCCUPATION_EMPTY = 0;
     public int OCCUPATION_ME = 1;
@@ -197,5 +199,11 @@ public class SharedArray {
         return value > 0
             ? new Location((value - 1) % 1060, (value - 1) / 1060)
             : null;
+    }
+
+    private int allocate(int size) {
+        int index = nextIndex;
+        nextIndex += size;
+        return index;
     }
 }

@@ -9,9 +9,7 @@ import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
 import myplayer.symmetry.HorizontalSymmetry;
 import myplayer.symmetry.RotationalSymmetry;
-import myplayer.symmetry.Symmetry;
 import myplayer.symmetry.VerticalSymmetry;
-import myplayer.util.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,8 +54,8 @@ public abstract class MoveableUnit extends Unit {
             int attempts = 10;
 
             for (int i = 0; i < attempts; i++) {
-                int x = RandomUtils.nextInt(minX, maxX + 1);
-                int y = RandomUtils.nextInt(minY, maxY + 1);
+                int x = random.nextInt(minX, maxX + 1);
+                int y = random.nextInt(minY, maxY + 1);
                 Location location = new Location(x, y);
 
                 if (i != attempts - 1 && exploredTiles.isExplored(location)) {
@@ -249,7 +247,7 @@ public abstract class MoveableUnit extends Unit {
             return false;
         }
 
-        for (Direction direction : RandomUtils.shuffle(adjacentDirections.clone())) {
+        for (Direction direction : random.shuffle(adjacentDirections.clone())) {
             if (tryMove(direction)) {
                 return true;
             }

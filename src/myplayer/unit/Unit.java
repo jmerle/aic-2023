@@ -13,6 +13,7 @@ import myplayer.symmetry.RotationalSymmetry;
 import myplayer.symmetry.Symmetry;
 import myplayer.symmetry.VerticalSymmetry;
 import myplayer.util.ExploredTiles;
+import myplayer.util.MyRandom;
 import myplayer.util.SharedArray;
 
 public abstract class Unit {
@@ -22,6 +23,8 @@ public abstract class Unit {
 
     protected Team myTeam;
     protected Team opponentTeam;
+
+    protected MyRandom random;
 
     protected SharedArray sharedArray;
     protected ExploredTiles exploredTiles;
@@ -51,6 +54,8 @@ public abstract class Unit {
 
         myTeam = uc.getTeam();
         opponentTeam = myTeam.getOpponent();
+
+        random = new MyRandom(uc);
 
         sharedArray = new SharedArray(uc);
     }

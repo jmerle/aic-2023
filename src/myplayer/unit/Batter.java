@@ -37,6 +37,11 @@ public class Batter extends MoveableUnit {
             return false;
         }
 
+        Direction bestMoveDirection = null;
+        Direction bestBatDirection = null;
+        int bestBatDistance = -1;
+        int maxScore = Integer.MIN_VALUE;
+
         Location myLocation = uc.getLocation();
 
         for (Direction moveDirection : Direction.values()) {
@@ -72,22 +77,87 @@ public class Batter extends MoveableUnit {
                     }
                 }
 
-                if (moveDirection != Direction.ZERO) {
-                    uc.move(moveDirection);
+                int score = getBatScore(batLocation, batDirection, batDistance, batUnit);
+                if (score > maxScore) {
+                    bestMoveDirection = moveDirection;
+                    bestBatDirection = batDirection;
+                    bestBatDistance = batDistance;
+                    maxScore = score;
                 }
-
-                uc.bat(batDirection, batDistance);
-                return moveDirection != Direction.ZERO;
             }
         }
 
-        return false;
+        if (bestMoveDirection == null && bestBatDirection == null) {
+            return false;
+        }
+
+        if (bestMoveDirection != Direction.ZERO) {
+            uc.move(bestMoveDirection);
+        }
+
+        uc.bat(bestBatDirection, bestBatDistance);
+        return bestMoveDirection != Direction.ZERO;
+    }
+
+    private int getBatScore(Location batLocation, Direction batDirection, int batDistance, UnitInfo batUnit) {
+        int killedFriendlies = 0;
+        int killedOpponents = 0;
+
+        for (int i = 1; i <= batDistance; i++) {
+            Location hitLocation = batLocation.add(batDirection.dx * i, batDirection.dy * i);
+
+            if (uc.getLocation().distanceSquared(hitLocation) > me.getStat(UnitStat.VISION_RANGE)) {
+                break;
+            }
+
+            if (uc.isOutOfMap(hitLocation)) {
+                if (batUnit.getTeam() == myTeam) {
+                    killedFriendlies++;
+                } else {
+                    killedOpponents++;
+                }
+
+                break;
+            }
+
+            MapObject hitObject = uc.senseObjectAtLocation(hitLocation, true);
+            if (hitObject == MapObject.WATER || hitObject == MapObject.BALL) {
+                if (batUnit.getTeam() == myTeam) {
+                    killedFriendlies++;
+                } else {
+                    killedOpponents++;
+                }
+
+                break;
+            }
+
+            UnitInfo hitUnit = uc.senseUnitAtLocation(hitLocation);
+            if (hitUnit != null) {
+                if (batUnit.getTeam() == myTeam) {
+                    killedFriendlies++;
+                } else {
+                    killedOpponents++;
+                }
+
+                if (hitUnit.getType() != UnitType.HQ) {
+                    if (hitUnit.getTeam() == myTeam) {
+                        killedFriendlies++;
+                    } else {
+                        killedOpponents++;
+                    }
+                }
+
+                break;
+            }
+        }
+
+        return killedOpponents - killedFriendlies;
     }
 
     private boolean shouldBatFriendly(Location batLocation, Direction batDirection, int batDistance, UnitInfo batUnit) {
         for (int i = 1; i <= batDistance; i++) {
             Location hitLocation = batLocation.add(batDirection.dx * i, batDirection.dy * i);
-            if (!uc.canSenseLocation(hitLocation)) {
+            if (uc.isOutOfMap(hitLocation)) {
                 return false;
             }
 

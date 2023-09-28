@@ -41,6 +41,7 @@ public abstract class Unit {
     };
 
     protected Location myHQ;
+    protected int spawnRound = -1;
 
     private Symmetry symmetry;
 
@@ -75,6 +76,11 @@ public abstract class Unit {
                     }
                 }
             }
+        }
+
+        if (spawnRound == -1) {
+            spawnRound = uc.getRound();
+            sharedArray.setSpawnRound(spawnRound);
         }
 
         if (sharedArray.getOpponentHQ() == null) {

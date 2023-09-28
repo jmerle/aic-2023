@@ -23,6 +23,8 @@ public class SharedArray {
     private int INDEX_UNEXPLORED_USE_MIN_X = allocate(1);
     private int INDEX_UNEXPLORED_USE_MIN_Y = allocate(1);
     public int INDEX_UNEXPLORED_OFFSET = allocate(GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE);
+    private int INDEX_MOVE_TARGET_OFFSET = allocate(GameConstants.MAX_ID);
+    private int INDEX_SPAWN_ROUND_OFFSET = allocate(GameConstants.MAX_ID);
 
     public int OCCUPATION_EMPTY = 0;
     public int OCCUPATION_ME = 1;
@@ -160,6 +162,22 @@ public class SharedArray {
         boolean yOffsetSubtract = !useMinY;
 
         return new ExploredTiles(uc, this, xOffset, xOffsetSubtract, yOffset, yOffsetSubtract);
+    }
+
+    public Location getMoveTarget(int id) {
+        return intToLocation(uc.read(INDEX_MOVE_TARGET_OFFSET + id - 1));
+    }
+
+    public void setMoveTarget(Location location) {
+        uc.write(INDEX_MOVE_TARGET_OFFSET + uc.getInfo().getID() - 1, locationToInt(location));
+    }
+
+    public int getSpawnRound(int id) {
+        return uc.read(INDEX_SPAWN_ROUND_OFFSET + id - 1);
+    }
+
+    public void setSpawnRound(int round) {
+        uc.write(INDEX_SPAWN_ROUND_OFFSET + uc.getInfo().getID() - 1, round);
     }
 
     private ExploredObject[] getExploredObjects(int indexCount, int indexOffset) {

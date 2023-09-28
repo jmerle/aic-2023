@@ -18,64 +18,29 @@ public class Batter extends MoveableUnit {
     public void run() {
         super.run();
 
-        if (uc.canAct() && !tryBat()) {
-            if (uc.canMove()) {
-                moveAndBat();
-            }
+        if (tryBat()) {
+            return;
         }
 
-        if (uc.canAct() && sharedArray.getOpponentHQ() != null) {
-            batFriendly();
+        Location opponentHQ = sharedArray.getOpponentHQ();
+        if (opponentHQ != null && uc.getLocation().distanceSquared(opponentHQ) <= 2) {
+            return;
         }
 
-        if (uc.canMove()) {
-            moveToTarget();
-        }
-
-        if (uc.canMove()) {
+        if (!tryMoveToTarget()) {
             explore();
         }
     }
 
     private boolean tryBat() {
-        Location myLocation = uc.getLocation();
-
-        for (Direction direction : adjacentDirections) {
-            Location target = myLocation.add(direction);
-            if (uc.isOutOfMap(target)) {
-                continue;
-            }
-
-            UnitInfo unit = uc.senseUnitAtLocation(target);
-            if (unit == null || unit.getTeam() == myTeam || unit.getType() == UnitType.HQ) {
-                continue;
-            }
-
-            if (tryBat(direction, 3)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private void moveAndBat() {
-        boolean targetExists = false;
-        for (UnitInfo unit : uc.senseUnits(8, opponentTeam)) {
-            if (unit.getType() == UnitType.BATTER) {
-                targetExists = true;
-                break;
-            }
-        }
-
-        if (!targetExists) {
-            return;
+        if (!uc.canAct()) {
+            return false;
         }
 
         Location myLocation = uc.getLocation();
 
-        for (Direction moveDirection : adjacentDirections) {
-            if (!uc.canMove(moveDirection)) {
+        for (Direction moveDirection : Direction.values()) {
+            if (moveDirection != Direction.ZERO && !uc.canMove(moveDirection)) {
                 continue;
             }
 
@@ -83,37 +48,83 @@ public class Batter extends MoveableUnit {
 
             for (Direction batDirection : adjacentDirections) {
                 Location batLocation = moveLocation.add(batDirection);
-                if (uc.isOutOfMap(batLocation)) {
+                if (batLocation.isEqual(myLocation) || !uc.canSenseLocation(batLocation)) {
                     continue;
                 }
 
-                UnitInfo unit = uc.senseUnitAtLocation(batLocation);
-                if (unit != null && unit.getTeam() == opponentTeam && unit.getType() != UnitType.HQ) {
-                    tryMove(moveDirection);
-                    tryBat(batDirection, 3);
-                    return;
+                UnitInfo batUnit = uc.senseUnitAtLocation(batLocation);
+                if (batUnit == null || batUnit.getType() == UnitType.HQ) {
+                    continue;
                 }
+
+                int batDistance = 3;
+                if (batUnit.getTeam() == myTeam) {
+                    for (int i = 3; i >= 1; i--) {
+                        Location finalLocation = batLocation.add(batDirection.dx * i, batDirection.dy * i);
+                        if (myLocation.distanceSquared(finalLocation) <= me.getStat(UnitStat.VISION_RANGE)) {
+                            batDistance = i;
+                            break;
+                        }
+                    }
+
+                    if (!shouldBatFriendly(batLocation, batDirection, batDistance, batUnit)) {
+                        continue;
+                    }
+                }
+
+                if (moveDirection != Direction.ZERO) {
+                    uc.move(moveDirection);
+                }
+
+                uc.bat(batDirection, batDistance);
+                return moveDirection != Direction.ZERO;
             }
         }
+
+        return false;
     }
 
-    private void moveToTarget() {
+    private boolean shouldBatFriendly(Location batLocation, Direction batDirection, int batDistance, UnitInfo batUnit) {
+        for (int i = 1; i <= batDistance; i++) {
+            Location hitLocation = batLocation.add(batDirection.dx * i, batDirection.dy * i);
+            if (!uc.canSenseLocation(hitLocation)) {
+                return false;
+            }
+
+            MapObject hitObject = uc.senseObjectAtLocation(hitLocation, true);
+            if (hitObject == MapObject.WATER || hitObject == MapObject.BALL) {
+                return false;
+            }
+
+            UnitInfo hitUnit = uc.senseUnitAtLocation(hitLocation);
+            if (hitUnit != null) {
+                return hitUnit.getTeam() == opponentTeam && hitUnit.getType() != UnitType.HQ;
+            }
+        }
+
+        if (batUnit.getType() != UnitType.BATTER) {
+            return false;
+        }
+
+        if (sharedArray.getSpawnRound(batUnit.getID()) > spawnRound) {
+            return false;
+        }
+
+        if (batUnit.getCurrentMovementCooldown() >= 1 && batUnit.getCurrentActionCooldown() >= 1) {
+            return false;
+        }
+
+        Location finalLocation = batLocation.add(batDirection.dx * batDistance, batDirection.dy * batDistance);
+
+        Location moveTarget = sharedArray.getMoveTarget(batUnit.getID());
+        return moveTarget != null && finalLocation.distanceSquared(moveTarget) < batLocation.distanceSquared(moveTarget);
+    }
+
+    private boolean tryMoveToTarget() {
         Location bestLocation = null;
         int minDistance = Integer.MAX_VALUE;
 
         Location myLocation = uc.getLocation();
-
-        for (ExploredObject object : sharedArray.getExploredBases()) {
-            if (object.occupation != sharedArray.OCCUPATION_OPPONENT) {
-                continue;
-            }
-
-            int distance = myLocation.distanceSquared(object.location);
-            if (distance < minDistance) {
-                bestLocation = object.location;
-                minDistance = distance;
-            }
-        }
 
         for (ExploredObject object : sharedArray.getExploredStadiums()) {
             if (object.occupation != sharedArray.OCCUPATION_OPPONENT) {
@@ -127,9 +138,21 @@ public class Batter extends MoveableUnit {
             }
         }
 
+        for (ExploredObject object : sharedArray.getExploredBases()) {
+            if (object.occupation != sharedArray.OCCUPATION_OPPONENT) {
+                continue;
+            }
+
+            int distance = myLocation.distanceSquared(object.location);
+            if (distance < minDistance) {
+                bestLocation = object.location;
+                minDistance = distance;
+            }
+        }
+
         if (bestLocation != null) {
             moveTo(bestLocation);
-            return;
+            return true;
         }
 
         for (UnitInfo unit : uc.senseUnits(me.getStat(UnitStat.VISION_RANGE), opponentTeam)) {
@@ -150,56 +173,6 @@ public class Batter extends MoveableUnit {
 
         if (bestLocation != null) {
             moveTo(bestLocation);
-        }
-    }
-
-    private void batFriendly() {
-        Location myLocation = uc.getLocation();
-        Location opponentHQ = sharedArray.getOpponentHQ();
-
-        outer:
-        for (Direction batDirection : adjacentDirections) {
-            int batDistance = batDirection.dx == 0 || batDirection.dy == 0 ? 3 : 2;
-
-            Location batLocation = myLocation.add(batDirection);
-            Location targetLocation = batLocation.add(batDirection.dx * batDistance, batDirection.dy * batDistance);
-            if (uc.isOutOfMap(batLocation)
-                || uc.isOutOfMap(targetLocation)
-                || batLocation.distanceSquared(opponentHQ) < targetLocation.distanceSquared(opponentHQ)) {
-                continue;
-            }
-
-            UnitInfo batUnit = uc.senseUnitAtLocation(batLocation);
-            if (batUnit == null
-                || batUnit.getTeam() != myTeam
-                || batUnit.getType() != UnitType.BATTER
-                || !uc.canSchedule(batUnit.getID())) {
-                continue;
-            }
-
-            for (int i = 1; i <= batDistance; i++) {
-                Location hitLocation = batLocation.add(batDirection.dx * i, batDirection.dy * i);
-
-                MapObject hitObject = uc.senseObjectAtLocation(hitLocation, true);
-                if (hitObject == MapObject.WATER || hitObject == MapObject.BALL) {
-                    continue outer;
-                }
-
-                UnitInfo hitUnit = uc.senseUnitAtLocation(hitLocation);
-                if (hitUnit != null && (hitUnit.getTeam() == myTeam || hitUnit.getType() == UnitType.HQ)) {
-                    continue outer;
-                }
-            }
-
-            if (tryBat(batDirection, batDistance)) {
-                return;
-            }
-        }
-    }
-
-    private boolean tryBat(Direction direction, int distance) {
-        if (uc.canBat(direction, distance)) {
-            uc.bat(direction, distance);
             return true;
         }
 

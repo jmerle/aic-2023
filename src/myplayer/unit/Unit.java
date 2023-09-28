@@ -148,13 +148,8 @@ public abstract class Unit {
             }
         }
 
-        for (Location location : uc.senseObjects(MapObject.BASE, visionRange)) {
-            sharedArray.setExploredBase(location, getOccupation(location));
-        }
-
-        for (Location location : uc.senseObjects(MapObject.STADIUM, visionRange)) {
-            sharedArray.setExploredStadium(location, getOccupation(location));
-        }
+        exploreObjects(MapObject.BASE);
+        exploreObjects(MapObject.STADIUM);
 
         if (sharedArray.hasExploredTiles()) {
             exploredTiles = sharedArray.getExploredTiles();
@@ -164,6 +159,12 @@ public abstract class Unit {
                 sharedFullExploredData = true;
                 previousExploreLocation = uc.getLocation();
             }
+        }
+    }
+
+    private void exploreObjects(MapObject type) {
+        for (Location location : uc.senseObjects(type, me.getStat(UnitStat.VISION_RANGE))) {
+            sharedArray.setExploredObject(location, type, getOccupation(location));
         }
     }
 

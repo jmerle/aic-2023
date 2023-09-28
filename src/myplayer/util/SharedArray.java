@@ -2,6 +2,7 @@ package myplayer.util;
 
 import aic2023.user.GameConstants;
 import aic2023.user.Location;
+import aic2023.user.MapObject;
 import aic2023.user.UnitController;
 
 public class SharedArray {
@@ -16,15 +17,15 @@ public class SharedArray {
     private int INDEX_MIN_Y = allocate(1);
     private int INDEX_HAS_MAX_Y = allocate(1);
     private int INDEX_MAX_Y = allocate(1);
-    private int INDEX_BASES_COUNT = allocate(1);
-    private int INDEX_BASES_OFFSET = allocate(GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE * 2);
-    private int INDEX_STADIUMS_COUNT = allocate(1);
-    private int INDEX_STADIUMS_OFFSET = allocate(GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE * 2);
+    private int INDEX_EXPLORED_OBJECTS_COUNT = allocate(1);
+    private int INDEX_EXPLORED_OBJECTS_OFFSET = allocate(GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE * 4);
     private int INDEX_UNEXPLORED_USE_MIN_X = allocate(1);
     private int INDEX_UNEXPLORED_USE_MIN_Y = allocate(1);
     public int INDEX_UNEXPLORED_OFFSET = allocate(GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE);
     private int INDEX_MOVE_TARGET_OFFSET = allocate(GameConstants.MAX_ID);
     private int INDEX_SPAWN_ROUND_OFFSET = allocate(GameConstants.MAX_ID);
+
+    private MapObject[] MAP_OBJECTS = MapObject.values();
 
     public int OCCUPATION_EMPTY = 0;
     public int OCCUPATION_ME = 1;
@@ -116,20 +117,57 @@ public class SharedArray {
         return hasMapWidth() && hasMapHeight();
     }
 
-    public ExploredObject[] getExploredBases() {
-        return getExploredObjects(INDEX_BASES_COUNT, INDEX_BASES_OFFSET);
+    public ExploredObject[] getExploredObjects() {
+        int count = uc.read(INDEX_EXPLORED_OBJECTS_COUNT);
+
+        ExploredObject[] objects = new ExploredObject[count];
+        for (int i = 0; i < count; i++) {
+            int baseIndex = INDEX_EXPLORED_OBJECTS_OFFSET + i * 4;
+            Location location = intToLocation(uc.read(baseIndex));
+            MapObject type = MAP_OBJECTS[uc.read(baseIndex + 1)];
+            int occupation = uc.read(baseIndex + 2);
+            int lastUpdate = uc.read(baseIndex + 3);
+
+            objects[i] = new ExploredObject(location, type, occupation, lastUpdate);
+        }
+
+        return objects;
     }
 
-    public void setExploredBase(Location location, int occupation) {
-        setExploredObject(INDEX_BASES_COUNT, INDEX_BASES_OFFSET, location, occupation);
+    public void setExploredObject(Location location, MapObject type, int occupation) {
+        int count = uc.read(INDEX_EXPLORED_OBJECTS_COUNT);
+
+        for (int i = 0; i < count; i++) {
+            int baseIndex = INDEX_EXPLORED_OBJECTS_OFFSET + i * 4;
+            if (location.isEqual(intToLocation(uc.read(baseIndex)))) {
+                uc.write(baseIndex + 1, type.ordinal());
+                uc.write(baseIndex + 2, occupation);
+                uc.write(baseIndex + 3, uc.getRound());
+                return;
+            }
+        }
+
+        int baseIndex = INDEX_EXPLORED_OBJECTS_OFFSET + count * 4;
+        uc.write(baseIndex, locationToInt(location));
+        uc.write(baseIndex + 1, type.ordinal());
+        uc.write(baseIndex + 2, occupation);
+        uc.write(baseIndex + 3, uc.getRound());
+        uc.write(INDEX_EXPLORED_OBJECTS_COUNT, count + 1);
     }
 
-    public ExploredObject[] getExploredStadiums() {
-        return getExploredObjects(INDEX_STADIUMS_COUNT, INDEX_STADIUMS_OFFSET);
-    }
+    public void updateExpiredExploredObjectOccupation() {
+        int count = uc.read(INDEX_EXPLORED_OBJECTS_COUNT);
 
-    public void setExploredStadium(Location location, int occupation) {
-        setExploredObject(INDEX_STADIUMS_COUNT, INDEX_STADIUMS_OFFSET, location, occupation);
+        int currentRound = uc.getRound();
+        int thresholdRound = currentRound - 3;
+
+        for (int i = 0; i < count; i++) {
+            int baseIndex = INDEX_EXPLORED_OBJECTS_OFFSET + i * 4;
+            int lastUpdate = uc.read(baseIndex + 3);
+            if (lastUpdate < thresholdRound) {
+                uc.write(baseIndex + 2, OCCUPATION_EMPTY);
+            }
+        }
     }
 
     public boolean hasExploredTiles() {
@@ -178,35 +216,6 @@ public class SharedArray {
 
     public void setSpawnRound(int round) {
         uc.write(INDEX_SPAWN_ROUND_OFFSET + uc.getInfo().getID() - 1, round);
-    }
-
-    private ExploredObject[] getExploredObjects(int indexCount, int indexOffset) {
-        int count = uc.read(indexCount);
-
-        ExploredObject[] objects = new ExploredObject[count];
-        for (int i = 0; i < count; i++) {
-            Location location = intToLocation(uc.read(indexOffset + i * 2));
-            int occupation = uc.read(indexOffset + i * 2 + 1);
-            objects[i] = new ExploredObject(location, occupation);
-        }
-
-        return objects;
-    }
-
-    private void setExploredObject(int indexCount, int indexOffset, Location location, int occupation) {
-        int count = uc.read(indexCount);
-
-        for (int i = 0; i < count; i++) {
-            Location currentLocation = intToLocation(uc.read(indexOffset + i * 2));
-            if (location.isEqual(currentLocation)) {
-                uc.write(indexOffset + i * 2 + 1, occupation);
-                return;
-            }
-        }
-
-        uc.write(indexOffset + count * 2, locationToInt(location));
-        uc.write(indexOffset + count * 2 + 1, occupation);
-        uc.write(indexCount, count + 1);
     }
 
     private int locationToInt(Location location) {

@@ -38,20 +38,15 @@ public class HQ extends Unit {
         if (hasSymmetry()) {
             Symmetry symmetry = getSymmetry();
 
-            for (ExploredObject object : sharedArray.getExploredBases()) {
+            for (ExploredObject object : sharedArray.getExploredObjects()) {
                 Location reflected = symmetry.reflect(object.location);
                 if (!exploredTiles.isExplored(reflected)) {
-                    sharedArray.setExploredBase(reflected, sharedArray.OCCUPATION_EMPTY);
-                }
-            }
-
-            for (ExploredObject object : sharedArray.getExploredStadiums()) {
-                Location reflected = symmetry.reflect(object.location);
-                if (!exploredTiles.isExplored(reflected)) {
-                    sharedArray.setExploredStadium(reflected, sharedArray.OCCUPATION_EMPTY);
+                    sharedArray.setExploredObject(reflected, object.type, sharedArray.OCCUPATION_EMPTY);
                 }
             }
         }
+
+        sharedArray.updateExpiredExploredObjectOccupation();
 
         boolean danger = false;
         for (UnitInfo unit : uc.senseUnits(me.getStat(UnitStat.VISION_RANGE), opponentTeam)) {

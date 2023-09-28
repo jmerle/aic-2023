@@ -38,25 +38,13 @@ public class Pitcher extends MoveableUnit {
 
         Location myLocation = uc.getLocation();
 
-        for (ExploredObject object : sharedArray.getExploredStadiums()) {
+        for (ExploredObject object : sharedArray.getExploredObjects()) {
             if (object.occupation != sharedArray.OCCUPATION_EMPTY) {
                 continue;
             }
 
             int distance = myLocation.distanceSquared(object.location);
-            if (distance < minDistance) {
-                bestLocation = object.location;
-                minDistance = distance;
-            }
-        }
-
-        for (ExploredObject object : sharedArray.getExploredBases()) {
-            if (object.occupation != sharedArray.OCCUPATION_EMPTY) {
-                continue;
-            }
-
-            int distance = myLocation.distanceSquared(object.location);
-            if (distance < minDistance) {
+            if (distance < minDistance || (distance == minDistance && object.type == MapObject.STADIUM)) {
                 bestLocation = object.location;
                 minDistance = distance;
             }

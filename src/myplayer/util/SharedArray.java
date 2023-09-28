@@ -156,11 +156,10 @@ public class SharedArray {
     }
 
     public void updateExpiredExploredObjectOccupation() {
-        int count = uc.read(INDEX_EXPLORED_OBJECTS_COUNT);
-
         int currentRound = uc.getRound();
         int thresholdRound = currentRound - 3;
 
+        int count = uc.read(INDEX_EXPLORED_OBJECTS_COUNT);
         for (int i = 0; i < count; i++) {
             int baseIndex = INDEX_EXPLORED_OBJECTS_OFFSET + i * 4;
             int lastUpdate = uc.read(baseIndex + 3);

@@ -20,6 +20,8 @@ public abstract class MoveableUnit extends Unit {
     private boolean wallOnRight;
     private Location lastFollowedWall;
 
+    private Direction previousDirection = Direction.ZERO;
+
     private Location explorationTarget;
 
     private boolean[] canMove;
@@ -128,7 +130,7 @@ public abstract class MoveableUnit extends Unit {
         updateCanMove();
 
         int currentDistance = myLocation.distanceSquared(target);
-        if (isWallFollowing && currentDistance < distanceBeforeWallFollowing) {
+        if (isWallFollowing && currentDistance <= distanceBeforeWallFollowing) {
             isWallFollowing = false;
         }
 
@@ -211,6 +213,7 @@ public abstract class MoveableUnit extends Unit {
             }
 
             if (canMove[direction.ordinal()]) {
+                previousDirection = direction;
                 uc.move(direction);
                 return;
             }
@@ -225,9 +228,16 @@ public abstract class MoveableUnit extends Unit {
         Location myLocation = uc.getLocation();
         UnitInfo[] opponentUnits = uc.senseUnits(18, opponentTeam);
 
+        Direction blockedDirection1 = previousDirection.opposite();
+        Direction blockedDirection2 = blockedDirection1.rotateLeft();
+        Direction blockedDirection3 = blockedDirection1.rotateRight();
+
         outer:
         for (Direction direction : adjacentDirections) {
-            if (!uc.canMove(direction)) {
+            if (direction == blockedDirection1
+                || direction == blockedDirection2
+                || direction == blockedDirection3
+                || !uc.canMove(direction)) {
                 continue;
             }
 
@@ -286,6 +296,7 @@ public abstract class MoveableUnit extends Unit {
 
     protected boolean tryMove(Direction direction) {
         if (uc.canMove(direction)) {
+            previousDirection = direction;
             uc.drawLineDebug(uc.getLocation(), uc.getLocation().add(direction), 0, 255, 0);
             uc.move(direction);
             return true;

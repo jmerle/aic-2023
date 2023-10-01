@@ -41,7 +41,6 @@ public abstract class Unit {
     };
 
     protected Location myHQ;
-    protected int spawnRound = -1;
 
     private Symmetry symmetry;
 
@@ -76,11 +75,6 @@ public abstract class Unit {
                     }
                 }
             }
-        }
-
-        if (spawnRound == -1) {
-            spawnRound = uc.getRound();
-            sharedArray.setSpawnRound(spawnRound);
         }
 
         if (sharedArray.getOpponentHQ() == null) {
@@ -150,6 +144,8 @@ public abstract class Unit {
 
         exploreObjects(MapObject.BASE);
         exploreObjects(MapObject.STADIUM);
+
+        sharedArray.updateLastRound();
 
         if (sharedArray.hasExploredTiles()) {
             exploredTiles = sharedArray.getExploredTiles();

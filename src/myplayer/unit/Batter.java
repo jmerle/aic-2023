@@ -173,7 +173,7 @@ public class Batter extends MoveableUnit {
         }
 
         if (batUnit.getType() != UnitType.BATTER
-            || sharedArray.getSpawnRound(batUnit.getID()) > spawnRound
+            || sharedArray.getLastRound(batUnit.getID()) == uc.getRound()
             || (batUnit.getCurrentMovementCooldown() >= 1 && batUnit.getCurrentActionCooldown() >= 1)) {
             return false;
         }

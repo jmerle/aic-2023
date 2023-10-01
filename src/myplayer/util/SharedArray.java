@@ -23,7 +23,7 @@ public class SharedArray {
     private int INDEX_UNEXPLORED_USE_MIN_Y = allocate(1);
     public int INDEX_UNEXPLORED_OFFSET = allocate(GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE);
     private int INDEX_MOVE_TARGET_OFFSET = allocate(GameConstants.MAX_ID);
-    private int INDEX_SPAWN_ROUND_OFFSET = allocate(GameConstants.MAX_ID);
+    private int INDEX_LAST_ROUND_OFFSET = allocate(GameConstants.MAX_ID);
 
     private MapObject[] MAP_OBJECTS = MapObject.values();
 
@@ -209,12 +209,12 @@ public class SharedArray {
         uc.write(INDEX_MOVE_TARGET_OFFSET + uc.getInfo().getID() - 1, locationToInt(location));
     }
 
-    public int getSpawnRound(int id) {
-        return uc.read(INDEX_SPAWN_ROUND_OFFSET + id - 1);
+    public int getLastRound(int id) {
+        return uc.read(INDEX_LAST_ROUND_OFFSET + id - 1);
     }
 
-    public void setSpawnRound(int round) {
-        uc.write(INDEX_SPAWN_ROUND_OFFSET + uc.getInfo().getID() - 1, round);
+    public void updateLastRound() {
+        uc.write(INDEX_LAST_ROUND_OFFSET + uc.getInfo().getID() - 1, uc.getRound());
     }
 
     private int locationToInt(Location location) {

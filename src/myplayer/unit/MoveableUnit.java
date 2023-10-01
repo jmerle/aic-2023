@@ -5,7 +5,6 @@ import aic2023.user.Location;
 import aic2023.user.MapObject;
 import aic2023.user.UnitController;
 import aic2023.user.UnitInfo;
-import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
 import myplayer.symmetry.HorizontalSymmetry;
 import myplayer.symmetry.RotationalSymmetry;
@@ -23,8 +22,8 @@ public abstract class MoveableUnit extends Unit {
 
     private Location explorationTarget;
 
-    private UnitInfo[] opponentUnits = null;
-    private int opponentUnitsRound = -1;
+    private boolean[] canMove;
+    private int canMoveLength = Direction.values().length;
 
     public MoveableUnit(UnitController uc, UnitType type) {
         super(uc, type);
@@ -117,7 +116,7 @@ public abstract class MoveableUnit extends Unit {
         uc.drawLineDebug(myLocation, target, 255, 0, 0);
         sharedArray.setMoveTarget(target);
 
-        if (myLocation.isEqual(target)) {
+        if (!uc.canMove() || myLocation.isEqual(target)) {
             return;
         }
 
@@ -126,18 +125,16 @@ public abstract class MoveableUnit extends Unit {
             isWallFollowing = false;
         }
 
+        updateCanMove();
+
         int currentDistance = myLocation.distanceSquared(target);
         if (isWallFollowing && currentDistance < distanceBeforeWallFollowing) {
             isWallFollowing = false;
         }
 
-        if (isWallFollowing && lastFollowedWall != null && uc.canSenseLocation(lastFollowedWall) && isPassable(lastFollowedWall)) {
-            isWallFollowing = false;
-        }
-
         if (!isWallFollowing) {
             Direction forward = myLocation.directionTo(target);
-            if (isPassable(myLocation.add(forward))) {
+            if (canMove[forward.ordinal()]) {
                 tryMove(forward);
                 return;
             } else {
@@ -167,7 +164,7 @@ public abstract class MoveableUnit extends Unit {
                 break;
             }
 
-            if (isPassable(location)) {
+            if (canMove[left.ordinal()]) {
                 leftDistance = location.distanceSquared(currentTarget);
                 break;
             }
@@ -181,7 +178,7 @@ public abstract class MoveableUnit extends Unit {
                 break;
             }
 
-            if (isPassable(location)) {
+            if (canMove[right.ordinal()]) {
                 rightDistance = location.distanceSquared(currentTarget);
                 break;
             }
@@ -213,7 +210,8 @@ public abstract class MoveableUnit extends Unit {
                 return;
             }
 
-            if (isPassable(location) && tryMove(direction)) {
+            if (canMove[direction.ordinal()]) {
+                uc.move(direction);
                 return;
             }
 
@@ -221,29 +219,55 @@ public abstract class MoveableUnit extends Unit {
         }
     }
 
-    private boolean isPassable(Location location) {
-        if (uc.isOutOfMap(location) || uc.senseUnitAtLocation(location) != null) {
-            return false;
-        }
+    private void updateCanMove() {
+        canMove = new boolean[canMoveLength];
 
-        MapObject mapObject = uc.senseObjectAtLocation(location, true);
-        if (mapObject == MapObject.WATER || (mapObject == MapObject.BALL && me != UnitType.CATCHER)) {
-            return false;
-        }
+        Location myLocation = uc.getLocation();
+        UnitInfo[] opponentUnits = uc.senseUnits(18, opponentTeam);
 
-        int round = uc.getRound();
-        if (opponentUnitsRound != round) {
-            opponentUnits = uc.senseUnits(me.getStat(UnitStat.VISION_RANGE), opponentTeam);
-            opponentUnitsRound = round;
-        }
-
-        for (UnitInfo unit : opponentUnits) {
-            if (unit.getType() == UnitType.BATTER && unit.getLocation().distanceSquared(location) <= 8) {
-                return false;
+        outer:
+        for (Direction direction : adjacentDirections) {
+            if (!uc.canMove(direction)) {
+                continue;
             }
-        }
 
-        return true;
+            Location moveLocation = myLocation.add(direction);
+
+            for (UnitInfo unit : opponentUnits) {
+                if (unit.getType() != UnitType.BATTER) {
+                    continue;
+                }
+
+                int distance = moveLocation.distanceSquared(unit.getLocation());
+                if (distance <= 2) {
+                    continue outer;
+                }
+
+                if (distance <= 8) {
+                    for (Direction inBetweenDirection : adjacentDirections) {
+                        Location inBetweenLocation = moveLocation.add(inBetweenDirection);
+
+                        if (inBetweenLocation.distanceSquared(unit.getLocation()) > 2) {
+                            continue;
+                        }
+
+                        MapObject inBetweenMapObject = uc.senseObjectAtLocation(inBetweenLocation, true);
+                        if (inBetweenMapObject == MapObject.WATER || inBetweenMapObject == MapObject.BALL) {
+                            continue;
+                        }
+
+                        UnitInfo inBetweenUnit = uc.senseUnitAtLocation(inBetweenLocation);
+                        if (inBetweenUnit != null) {
+                            continue;
+                        }
+
+                        continue outer;
+                    }
+                }
+            }
+
+            canMove[direction.ordinal()] = true;
+        }
     }
 
     protected boolean tryMoveRandom() {

@@ -246,8 +246,8 @@ public abstract class MoveableUnit extends Unit {
                 if (distance <= 8) {
                     for (Direction inBetweenDirection : adjacentDirections) {
                         Location inBetweenLocation = moveLocation.add(inBetweenDirection);
-
-                        if (inBetweenLocation.distanceSquared(unit.getLocation()) > 2) {
+                        if (uc.isOutOfMap(inBetweenLocation)
+                            || inBetweenLocation.distanceSquared(unit.getLocation()) > 2) {
                             continue;
                         }
 

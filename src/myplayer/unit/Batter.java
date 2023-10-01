@@ -172,15 +172,9 @@ public class Batter extends MoveableUnit {
             }
         }
 
-        if (batUnit.getType() != UnitType.BATTER) {
-            return false;
-        }
-
-        if (sharedArray.getSpawnRound(batUnit.getID()) > spawnRound) {
-            return false;
-        }
-
-        if (batUnit.getCurrentMovementCooldown() >= 1 && batUnit.getCurrentActionCooldown() >= 1) {
+        if (batUnit.getType() != UnitType.BATTER
+            || sharedArray.getSpawnRound(batUnit.getID()) > spawnRound
+            || (batUnit.getCurrentMovementCooldown() >= 1 && batUnit.getCurrentActionCooldown() >= 1)) {
             return false;
         }
 

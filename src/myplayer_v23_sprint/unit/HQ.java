@@ -1,4 +1,4 @@
-package myplayer_v23.unit;
+package myplayer_v23_sprint.unit;
 
 import aic2023.user.Direction;
 import aic2023.user.Location;
@@ -6,8 +6,8 @@ import aic2023.user.UnitController;
 import aic2023.user.UnitInfo;
 import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
-import myplayer_v23.symmetry.Symmetry;
-import myplayer_v23.util.ExploredObject;
+import myplayer_v23_sprint.symmetry.Symmetry;
+import myplayer_v23_sprint.util.ExploredObject;
 
 import java.util.Arrays;
 import java.util.Comparator;

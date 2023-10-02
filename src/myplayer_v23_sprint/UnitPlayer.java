@@ -1,13 +1,13 @@
-package myplayer_v23;
+package myplayer_v23_sprint;
 
 import aic2023.user.Location;
 import aic2023.user.UnitController;
 import aic2023.user.UnitType;
-import myplayer_v23.unit.Batter;
-import myplayer_v23.unit.Catcher;
-import myplayer_v23.unit.HQ;
-import myplayer_v23.unit.Pitcher;
-import myplayer_v23.unit.Unit;
+import myplayer_v23_sprint.unit.Batter;
+import myplayer_v23_sprint.unit.Catcher;
+import myplayer_v23_sprint.unit.HQ;
+import myplayer_v23_sprint.unit.Pitcher;
+import myplayer_v23_sprint.unit.Unit;
 
 public class UnitPlayer {
     public void run(UnitController uc) {

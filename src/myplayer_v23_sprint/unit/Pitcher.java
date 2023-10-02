@@ -1,10 +1,10 @@
-package myplayer_v23.unit;
+package myplayer_v23_sprint.unit;
 
 import aic2023.user.Location;
 import aic2023.user.MapObject;
 import aic2023.user.UnitController;
 import aic2023.user.UnitType;
-import myplayer_v23.util.ExploredObject;
+import myplayer_v23_sprint.util.ExploredObject;
 
 public class Pitcher extends MoveableUnit {
     public Pitcher(UnitController uc) {

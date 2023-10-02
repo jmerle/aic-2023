@@ -1,4 +1,4 @@
-package myplayer_v23.util;
+package myplayer_v23_sprint.util;
 
 import aic2023.user.GameConstants;
 import aic2023.user.Location;

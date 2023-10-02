@@ -1,6 +1,6 @@
-package myplayer_v23.symmetry;
+package myplayer_v23_sprint.symmetry;
 
-import myplayer_v23.util.SharedArray;
+import myplayer_v23_sprint.util.SharedArray;
 
 public class RotationalSymmetry extends Symmetry {
     public RotationalSymmetry(SharedArray sharedArray) {

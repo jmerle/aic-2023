@@ -1,7 +1,7 @@
-package myplayer_v23.symmetry;
+package myplayer_v23_sprint.symmetry;
 
 import aic2023.user.Location;
-import myplayer_v23.util.SharedArray;
+import myplayer_v23_sprint.util.SharedArray;
 
 public abstract class Symmetry {
     private boolean reflectX;

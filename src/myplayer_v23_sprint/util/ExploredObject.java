@@ -1,4 +1,4 @@
-package myplayer_v23.util;
+package myplayer_v23_sprint.util;
 
 import aic2023.user.Location;
 import aic2023.user.MapObject;

@@ -1,4 +1,4 @@
-package myplayer_v23.unit;
+package myplayer_v23_sprint.unit;
 
 import aic2023.user.Direction;
 import aic2023.user.Location;
@@ -7,7 +7,7 @@ import aic2023.user.UnitController;
 import aic2023.user.UnitInfo;
 import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
-import myplayer_v23.util.ExploredObject;
+import myplayer_v23_sprint.util.ExploredObject;
 
 public class Batter extends MoveableUnit {
     public Batter(UnitController uc) {

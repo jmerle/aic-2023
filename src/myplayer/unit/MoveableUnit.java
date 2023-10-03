@@ -220,6 +220,8 @@ public abstract class MoveableUnit extends Unit {
 
             lastFollowedWall = location;
         }
+
+        previousDirection = Direction.ZERO;
     }
 
     private void updateCanMove() {
@@ -228,16 +230,9 @@ public abstract class MoveableUnit extends Unit {
         Location myLocation = uc.getLocation();
         UnitInfo[] opponentUnits = uc.senseUnits(18, opponentTeam);
 
-        Direction blockedDirection1 = previousDirection.opposite();
-        Direction blockedDirection2 = blockedDirection1.rotateLeft();
-        Direction blockedDirection3 = blockedDirection1.rotateRight();
-
         outer:
         for (Direction direction : adjacentDirections) {
-            if (direction == blockedDirection1
-                || direction == blockedDirection2
-                || direction == blockedDirection3
-                || !uc.canMove(direction)) {
+            if (direction == previousDirection.opposite() || !uc.canMove(direction)) {
                 continue;
             }
 

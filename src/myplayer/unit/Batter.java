@@ -7,11 +7,17 @@ import aic2023.user.UnitController;
 import aic2023.user.UnitInfo;
 import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
+import myplayer.util.BatScore;
+import myplayer.util.BatScorer;
 import myplayer.util.ExploredObject;
 
 public class Batter extends MoveableUnit {
+    private BatScorer scorer;
+
     public Batter(UnitController uc) {
         super(uc, UnitType.BATTER);
+
+        scorer = new BatScorer(uc, sharedArray);
     }
 
     @Override
@@ -57,32 +63,16 @@ public class Batter extends MoveableUnit {
                     continue;
                 }
 
-                UnitInfo batUnit = uc.senseUnitAtLocation(batLocation);
-                if (batUnit == null || batUnit.getType() == UnitType.HQ) {
+                BatScore score = scorer.getBatScore(batLocation, batDirection);
+                if (score == null) {
                     continue;
                 }
 
-                int batDistance = 3;
-                if (batUnit.getTeam() == myTeam) {
-                    for (int i = 3; i >= 1; i--) {
-                        Location finalLocation = batLocation.add(batDirection.dx * i, batDirection.dy * i);
-                        if (myLocation.distanceSquared(finalLocation) <= me.getStat(UnitStat.VISION_RANGE)) {
-                            batDistance = i;
-                            break;
-                        }
-                    }
-
-                    if (!shouldBatFriendly(batLocation, batDirection, batDistance, batUnit)) {
-                        continue;
-                    }
-                }
-
-                int score = getBatScore(batLocation, batDirection, batDistance, batUnit);
-                if (score > maxScore) {
+                if (score.score > maxScore) {
                     bestMoveDirection = moveDirection;
                     bestBatDirection = batDirection;
-                    bestBatDistance = batDistance;
-                    maxScore = score;
+                    bestBatDistance = score.distance;
+                    maxScore = score.score;
                 }
             }
         }
@@ -97,91 +87,6 @@ public class Batter extends MoveableUnit {
 
         uc.bat(bestBatDirection, bestBatDistance);
         return bestMoveDirection != Direction.ZERO;
-    }
-
-    private int getBatScore(Location batLocation, Direction batDirection, int batDistance, UnitInfo batUnit) {
-        int killedFriendlies = 0;
-        int killedOpponents = 0;
-
-        for (int i = 1; i <= batDistance; i++) {
-            Location hitLocation = batLocation.add(batDirection.dx * i, batDirection.dy * i);
-
-            if (uc.getLocation().distanceSquared(hitLocation) > me.getStat(UnitStat.VISION_RANGE)) {
-                break;
-            }
-
-            if (uc.isOutOfMap(hitLocation)) {
-                if (batUnit.getTeam() == myTeam) {
-                    killedFriendlies++;
-                } else {
-                    killedOpponents++;
-                }
-
-                break;
-            }
-
-            MapObject hitObject = uc.senseObjectAtLocation(hitLocation, true);
-            if (hitObject == MapObject.WATER || hitObject == MapObject.BALL) {
-                if (batUnit.getTeam() == myTeam) {
-                    killedFriendlies++;
-                } else {
-                    killedOpponents++;
-                }
-
-                break;
-            }
-
-            UnitInfo hitUnit = uc.senseUnitAtLocation(hitLocation);
-            if (hitUnit != null) {
-                if (batUnit.getTeam() == myTeam) {
-                    killedFriendlies++;
-                } else {
-                    killedOpponents++;
-                }
-
-                if (hitUnit.getType() != UnitType.HQ) {
-                    if (hitUnit.getTeam() == myTeam) {
-                        killedFriendlies++;
-                    } else {
-                        killedOpponents++;
-                    }
-                }
-
-                break;
-            }
-        }
-
-        return killedOpponents - killedFriendlies;
-    }
-
-    private boolean shouldBatFriendly(Location batLocation, Direction batDirection, int batDistance, UnitInfo batUnit) {
-        for (int i = 1; i <= batDistance; i++) {
-            Location hitLocation = batLocation.add(batDirection.dx * i, batDirection.dy * i);
-            if (uc.isOutOfMap(hitLocation)) {
-                return false;
-            }
-
-            MapObject hitObject = uc.senseObjectAtLocation(hitLocation, true);
-            if (hitObject == MapObject.WATER || hitObject == MapObject.BALL) {
-                return false;
-            }
-
-            UnitInfo hitUnit = uc.senseUnitAtLocation(hitLocation);
-            if (hitUnit != null) {
-                return hitUnit.getTeam() == opponentTeam && hitUnit.getType() != UnitType.HQ;
-            }
-        }
-
-        if (batUnit.getType() != UnitType.BATTER
-            || sharedArray.getLastRound(batUnit.getID()) == uc.getRound()
-            || (batUnit.getCurrentMovementCooldown() >= 1 && batUnit.getCurrentActionCooldown() >= 1)) {
-            return false;
-        }
-
-        Location finalLocation = batLocation.add(batDirection.dx * batDistance, batDirection.dy * batDistance);
-
-        Location moveTarget = sharedArray.getMoveTarget(batUnit.getID());
-        return moveTarget != null && finalLocation.distanceSquared(moveTarget) < batLocation.distanceSquared(moveTarget);
     }
 
     private boolean tryMoveToTarget() {

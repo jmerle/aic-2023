@@ -1,12 +1,15 @@
 package myplayer.unit;
 
 import aic2023.user.Direction;
+import aic2023.user.GameConstants;
 import aic2023.user.Location;
 import aic2023.user.UnitController;
 import aic2023.user.UnitInfo;
 import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
 import myplayer.symmetry.Symmetry;
+import myplayer.util.BatScore;
+import myplayer.util.BatScorer;
 import myplayer.util.ExploredObject;
 
 import java.util.Arrays;
@@ -18,8 +21,12 @@ public class HQ extends Unit {
     private Direction[] recruitDirections = adjacentDirections.clone();
     private boolean sortedRecruitDirections = false;
 
+    private BatScorer batScorer;
+
     public HQ(UnitController uc) {
         super(uc, UnitType.HQ);
+
+        batScorer = new BatScorer(uc, sharedArray);
     }
 
     @Override
@@ -79,10 +86,65 @@ public class HQ extends Unit {
         }
 
         if (type == UnitType.BATTER) {
+            if (uc.getReputation() >= type.getStat(UnitStat.REP_COST) + GameConstants.BALL_COST) {
+                if (tryRecruitBatterWithBall()) {
+                    return true;
+                }
+            }
+
             return tryRecruitOffensive(type);
         } else {
             return tryRecruitDefensive(type);
         }
+    }
+
+    private boolean tryRecruitBatterWithBall() {
+        if (uc.getRound() < 5) {
+            return false;
+        }
+
+        Direction bestBatterDirection = null;
+        Direction bestBallDirection = null;
+        int maxScore = 0;
+
+        for (Direction batterDirection : recruitDirections) {
+            Direction ballDirection = batterDirection.rotateLeft();
+            int score = getBatterWithBallScore(batterDirection, ballDirection);
+            if (score > maxScore) {
+                bestBatterDirection = batterDirection;
+                bestBallDirection = ballDirection;
+                maxScore = score;
+            }
+
+            ballDirection = batterDirection.rotateRight();
+            score = getBatterWithBallScore(batterDirection, ballDirection);
+            if (score > maxScore) {
+                bestBatterDirection = batterDirection;
+                bestBallDirection = ballDirection;
+                maxScore = score;
+            }
+        }
+
+        if (bestBatterDirection == null) {
+            return false;
+        }
+
+        uc.recruitUnit(UnitType.BATTER, bestBatterDirection);
+        uc.constructBall(bestBallDirection);
+        return true;
+    }
+
+    private int getBatterWithBallScore(Direction batterDirection, Direction ballDirection) {
+        if (!uc.canRecruitUnit(UnitType.BATTER, batterDirection) || !uc.canConstructBall(ballDirection)) {
+            return 0;
+        }
+
+        Location batterLocation = myHQ.add(batterDirection);
+        Location ballLocation = myHQ.add(ballDirection);
+        Direction batDirection = batterLocation.directionTo(ballLocation);
+
+        BatScore score = batScorer.getBatScoreBall(ballLocation, batDirection);
+        return score != null ? score.score : 0;
     }
 
     private boolean tryRecruitOffensive(UnitType type) {

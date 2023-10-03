@@ -209,8 +209,8 @@ public class SharedArray {
         uc.write(INDEX_MOVE_TARGET_OFFSET + uc.getInfo().getID() - 1, locationToInt(location));
     }
 
-    public int getLastRound(int id) {
-        return uc.read(INDEX_LAST_ROUND_OFFSET + id - 1);
+    public boolean hasActed(int id) {
+        return uc.read(INDEX_LAST_ROUND_OFFSET + id - 1) == uc.getRound();
     }
 
     public void updateLastRound() {

@@ -64,6 +64,7 @@ public abstract class MoveableUnit extends Unit {
                 }
 
                 explorationTarget = new Location(x, y);
+                break;
             }
         }
 

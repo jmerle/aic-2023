@@ -28,14 +28,11 @@ public class Batter extends MoveableUnit {
             return;
         }
 
-        Location opponentHQ = sharedArray.getOpponentHQ();
-        if (opponentHQ != null && uc.getLocation().distanceSquared(opponentHQ) <= 2) {
+        if (tryMoveToTarget()) {
             return;
         }
 
-        if (!tryMoveToTarget()) {
-            explore();
-        }
+        explore();
     }
 
     private boolean tryBat() {

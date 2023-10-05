@@ -69,13 +69,16 @@ public class HQ extends Unit {
 
             if (danger) {
                 didSomething = tryRecruit(UnitType.BATTER);
-                continue;
+            } else {
+                UnitType type = recruitBatter ? UnitType.BATTER : UnitType.PITCHER;
+                if (tryRecruit(type)) {
+                    didSomething = true;
+                    recruitBatter = !recruitBatter;
+                }
             }
 
-            UnitType type = recruitBatter ? UnitType.BATTER : UnitType.PITCHER;
-            if (tryRecruit(type)) {
+            if (tryConstructBall()) {
                 didSomething = true;
-                recruitBatter = !recruitBatter;
             }
         }
     }
@@ -86,102 +89,41 @@ public class HQ extends Unit {
         }
 
         if (type == UnitType.BATTER) {
-            if (uc.getReputation() >= type.getStat(UnitStat.REP_COST) + GameConstants.BALL_COST) {
-                if (tryRecruitBatterWithBall()) {
-                    return true;
-                }
-            }
-
-            return tryRecruitOffensive(type);
+            return tryRecruitBatter();
         } else {
             return tryRecruitDefensive(type);
         }
     }
 
-    private boolean tryRecruitBatterWithBall() {
-        if (uc.getRound() < 5) {
-            return false;
-        }
-
-        Direction bestBatterDirection = null;
-        Direction bestBallDirection = null;
-        int maxScore = 0;
+    private boolean tryRecruitBatter() {
+        Direction bestDirection = null;
+        int maxScore = Integer.MIN_VALUE;
 
         for (Direction batterDirection : recruitDirections) {
-            Direction ballDirection = batterDirection.rotateLeft();
-            int score = getBatterWithBallScore(batterDirection, ballDirection);
-            if (score > maxScore) {
-                bestBatterDirection = batterDirection;
-                bestBallDirection = ballDirection;
-                maxScore = score;
-            }
-
-            ballDirection = batterDirection.rotateRight();
-            score = getBatterWithBallScore(batterDirection, ballDirection);
-            if (score > maxScore) {
-                bestBatterDirection = batterDirection;
-                bestBallDirection = ballDirection;
-                maxScore = score;
-            }
-        }
-
-        if (bestBatterDirection == null) {
-            return false;
-        }
-
-        uc.recruitUnit(UnitType.BATTER, bestBatterDirection);
-        uc.constructBall(bestBallDirection);
-        return true;
-    }
-
-    private int getBatterWithBallScore(Direction batterDirection, Direction ballDirection) {
-        if (!uc.canRecruitUnit(UnitType.BATTER, batterDirection) || !uc.canConstructBall(ballDirection)) {
-            return 0;
-        }
-
-        Location batterLocation = myHQ.add(batterDirection);
-        Location ballLocation = myHQ.add(ballDirection);
-        Direction batDirection = batterLocation.directionTo(ballLocation);
-
-        BatScore score = batScorer.getBatScoreBall(ballLocation, batDirection);
-        return score != null ? score.score : 0;
-    }
-
-    private boolean tryRecruitOffensive(UnitType type) {
-        UnitInfo[] opponentUnits = uc.senseUnits(18, opponentTeam);
-
-        for (Direction direction : recruitDirections) {
-            if (!uc.canRecruitUnit(type, direction)) {
+            if (!uc.canRecruitUnit(UnitType.BATTER, batterDirection)) {
                 continue;
             }
 
-            Location recruitLocation = myHQ.add(direction);
+            Location batterLocation = myHQ.add(batterDirection);
 
-            for (UnitInfo unit : opponentUnits) {
-                if (unit.getType() == type && unit.getLocation().distanceSquared(recruitLocation) <= 2) {
-                    uc.recruitUnit(type, direction);
-                    return true;
+            for (Direction batDirection : adjacentDirections) {
+                Location batLocation = batterLocation.add(batDirection);
+
+                BatScore score = batScorer.getBatScore(batLocation, batDirection);
+                if (score != null && score.score > maxScore) {
+                    bestDirection = batterDirection;
+                    maxScore = score.score;
                 }
             }
         }
 
-        for (Direction direction : recruitDirections) {
-            if (!uc.canRecruitUnit(type, direction)) {
-                continue;
-            }
-
-            Location recruitLocation = myHQ.add(direction);
-
-            for (UnitInfo unit : opponentUnits) {
-                if (unit.getType() == type && unit.getLocation().distanceSquared(recruitLocation) <= 8) {
-                    uc.recruitUnit(type, direction);
-                    return true;
-                }
-            }
+        if (bestDirection != null) {
+            uc.recruitUnit(UnitType.BATTER, bestDirection);
+            return true;
         }
 
         for (Direction direction : recruitDirections) {
-            if (tryRecruit(type, direction)) {
+            if (tryRecruit(UnitType.BATTER, direction)) {
                 return true;
             }
         }
@@ -217,6 +159,53 @@ public class HQ extends Unit {
         }
 
         return false;
+    }
+
+    private boolean tryConstructBall() {
+        if (uc.getReputation() < GameConstants.BALL_COST) {
+            return false;
+        }
+
+        if (uc.senseUnits(me.getStat(UnitStat.VISION_RANGE), opponentTeam).length == 0) {
+            return false;
+        }
+
+        UnitInfo[] myUnits = uc.senseUnits(8, myTeam);
+        if (myUnits.length == 0) {
+            return false;
+        }
+
+        Direction bestDirection = null;
+        int maxScore = Integer.MIN_VALUE;
+
+        for (Direction ballDirection : adjacentDirections) {
+            if (!uc.canConstructBall(ballDirection)) {
+                continue;
+            }
+
+            Location ballLocation = myHQ.add(ballDirection);
+
+            for (UnitInfo unit : myUnits) {
+                if (unit.getType() != UnitType.BATTER || unit.getLocation().distanceSquared(ballLocation) > 2) {
+                    continue;
+                }
+
+                Direction batDirection = unit.getLocation().directionTo(ballLocation);
+
+                BatScore score = batScorer.getBatScoreBall(ballLocation, batDirection);
+                if (score != null && score.score > maxScore) {
+                    bestDirection = ballDirection;
+                    maxScore = score.score;
+                }
+            }
+        }
+
+        if (bestDirection == null) {
+            return false;
+        }
+
+        uc.constructBall(bestDirection);
+        return true;
     }
 
     private boolean tryRecruit(UnitType type, Direction direction) {

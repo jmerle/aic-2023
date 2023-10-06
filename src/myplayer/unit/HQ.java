@@ -3,6 +3,7 @@ package myplayer.unit;
 import aic2023.user.Direction;
 import aic2023.user.GameConstants;
 import aic2023.user.Location;
+import aic2023.user.MapObject;
 import aic2023.user.UnitController;
 import aic2023.user.UnitInfo;
 import aic2023.user.UnitStat;
@@ -16,10 +17,23 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public class HQ extends Unit {
-    private boolean recruitBatter = true;
+    private UnitType[] defaultRecruitOrder = {
+        UnitType.BATTER,
+        UnitType.PITCHER
+    };
 
-    private Direction[] recruitDirections = adjacentDirections.clone();
-    private boolean sortedRecruitDirections = false;
+    private UnitType[] dangerRecruitOrder = {
+        UnitType.BATTER,
+        UnitType.BATTER,
+        UnitType.BATTER,
+        UnitType.BATTER,
+        UnitType.PITCHER
+    };
+
+    private int defaultRecruitIndex = 0;
+    private int dangerRecruitIndex = 0;
+
+    private Direction[] recruitDirections = null;
 
     private BatScorer batScorer;
 
@@ -33,13 +47,32 @@ public class HQ extends Unit {
     public void run() {
         super.run();
 
-        if (!sortedRecruitDirections && sharedArray.hasMapSize()) {
-            int centerX = sharedArray.getMinX() + sharedArray.getMapWidth() / 2;
-            int centerY = sharedArray.getMinY() + sharedArray.getMapHeight() / 2;
-            Location center = new Location(centerX, centerY);
+        if (recruitDirections == null) {
+            int[] directionScores = new int[Direction.values().length];
 
-            Arrays.sort(adjacentDirections, Comparator.comparingInt(direction -> myHQ.add(direction).distanceSquared(center)));
-            sortedRecruitDirections = true;
+            for (Direction direction : adjacentDirections) {
+                for (int i = 1; i <= 8; i++) {
+                    Location location = myHQ.add(direction.dx * i, direction.dy * i);
+                    if (!uc.canSenseLocation(location)) {
+                        break;
+                    }
+
+                    MapObject mapObject = uc.senseObjectAtLocation(location, false);
+                    if (mapObject == MapObject.WATER) {
+                        break;
+                    }
+
+                    UnitInfo unit = uc.senseUnitAtLocation(location);
+                    if (unit != null && unit.getType() == UnitType.HQ) {
+                        break;
+                    }
+
+                    directionScores[direction.ordinal()] = i;
+                }
+            }
+
+            recruitDirections = adjacentDirections.clone();
+            Arrays.sort(recruitDirections, Comparator.comparingInt(direction -> -directionScores[direction.ordinal()]));
         }
 
         if (hasSymmetry()) {
@@ -68,16 +101,23 @@ public class HQ extends Unit {
             didSomething = false;
 
             if (danger) {
-                didSomething = tryRecruit(UnitType.BATTER);
-            } else {
-                UnitType type = recruitBatter ? UnitType.BATTER : UnitType.PITCHER;
-                if (tryRecruit(type)) {
+                if (tryRecruit(dangerRecruitOrder[dangerRecruitIndex])) {
                     didSomething = true;
-                    recruitBatter = !recruitBatter;
+                    dangerRecruitIndex = (dangerRecruitIndex + 1) % dangerRecruitOrder.length;
+                }
+            } else {
+                if (tryRecruit(defaultRecruitOrder[defaultRecruitIndex])) {
+                    didSomething = true;
+                    defaultRecruitIndex = (defaultRecruitIndex + 1) % defaultRecruitOrder.length;
+                    dangerRecruitIndex = 0;
                 }
             }
 
-            if (tryConstructBall()) {
+            if (tryConstructBallForBatter()) {
+                didSomething = true;
+            }
+
+            if (tryConstructBallsForPitchers()) {
                 didSomething = true;
             }
         }
@@ -106,8 +146,11 @@ public class HQ extends Unit {
 
             Location batterLocation = myHQ.add(batterDirection);
 
-            for (Direction batDirection : adjacentDirections) {
+            for (Direction batDirection : recruitDirections) {
                 Location batLocation = batterLocation.add(batDirection);
+                if (!uc.canSenseLocation(batLocation)) {
+                    continue;
+                }
 
                 BatScore score = batScorer.getBatScore(batLocation, batDirection);
                 if (score != null && score.score > maxScore) {
@@ -123,7 +166,8 @@ public class HQ extends Unit {
         }
 
         for (Direction direction : recruitDirections) {
-            if (tryRecruit(UnitType.BATTER, direction)) {
+            if (uc.canRecruitUnit(UnitType.BATTER, direction)) {
+                uc.recruitUnit(UnitType.BATTER, direction);
                 return true;
             }
         }
@@ -153,7 +197,8 @@ public class HQ extends Unit {
         }
 
         for (Direction direction : recruitDirections) {
-            if (tryRecruit(type, direction)) {
+            if (uc.canRecruitUnit(type, direction)) {
+                uc.recruitUnit(type, direction);
                 return true;
             }
         }
@@ -161,7 +206,7 @@ public class HQ extends Unit {
         return false;
     }
 
-    private boolean tryConstructBall() {
+    private boolean tryConstructBallForBatter() {
         if (uc.getReputation() < GameConstants.BALL_COST) {
             return false;
         }
@@ -178,7 +223,7 @@ public class HQ extends Unit {
         Direction bestDirection = null;
         int maxScore = Integer.MIN_VALUE;
 
-        for (Direction ballDirection : adjacentDirections) {
+        for (Direction ballDirection : recruitDirections) {
             if (!uc.canConstructBall(ballDirection)) {
                 continue;
             }
@@ -208,12 +253,54 @@ public class HQ extends Unit {
         return true;
     }
 
-    private boolean tryRecruit(UnitType type, Direction direction) {
-        if (uc.canRecruitUnit(type, direction)) {
-            uc.recruitUnit(type, direction);
-            return true;
+    private boolean tryConstructBallsForPitchers() {
+        int ballsLeft = (int) (uc.getReputation() / GameConstants.BALL_COST);
+        if (ballsLeft == 0) {
+            return false;
         }
 
-        return false;
+        UnitInfo[] myUnits = uc.senseUnits(8, myTeam);
+        boolean didSomething = false;
+
+        outer:
+        for (UnitInfo unit : myUnits) {
+            if (unit.getType() != UnitType.PITCHER || unit.isCarryingBall()) {
+                continue;
+            }
+
+            Location unitLocation = unit.getLocation();
+
+            for (Direction direction : recruitDirections) {
+                Location adjacentLocation = unitLocation.add(direction);
+
+                MapObject adjacentObject = uc.senseObjectAtLocation(adjacentLocation, true);
+                if (adjacentObject == MapObject.BALL) {
+                    continue outer;
+                }
+            }
+
+            for (Direction direction : recruitDirections) {
+                Location adjacentLocation = unitLocation.add(direction);
+                if (myHQ.distanceSquared(adjacentLocation) > 2) {
+                    continue;
+                }
+
+                Direction constructDirection = myHQ.directionTo(adjacentLocation);
+                if (uc.canConstructBall(constructDirection)) {
+                    uc.constructBall(constructDirection);
+
+                    ballsLeft--;
+                    didSomething = true;
+
+                    if (ballsLeft == 0) {
+                        return didSomething;
+                    }
+
+                    continue outer;
+                }
+            }
+        }
+
+        return didSomething;
     }
 }

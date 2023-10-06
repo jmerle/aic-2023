@@ -130,10 +130,7 @@ public class BatScorer {
             boolean ballDestroyed = false;
 
             MapObject hitObject = uc.senseObjectAtLocation(hitLocation, true);
-            if (hitObject == MapObject.BALL) {
-                currentScore++;
-                ballDestroyed = true;
-            } else if (hitObject == MapObject.WATER) {
+            if (hitObject == MapObject.WATER || hitObject == MapObject.BALL) {
                 break;
             }
 

@@ -12,19 +12,17 @@ import myplayer.unit.Unit;
 public class UnitPlayer {
     public void run(UnitController uc) {
         Unit unit = createUnit(uc);
-
         if (unit == null) {
             return;
         }
 
         while (true) {
-            if (performTurn(uc, unit)) {
-                uc.yield();
-            }
+            performTurn(uc, unit);
+            uc.yield();
         }
     }
 
-    private boolean performTurn(UnitController uc, Unit unit) {
+    private void performTurn(UnitController uc, Unit unit) {
         int startRound = uc.getRound();
         int startBytecodes = uc.getEnergyUsed();
 
@@ -44,11 +42,12 @@ public class UnitPlayer {
             : (maxBytecodes - startBytecodes) + Math.max(0, endRound - startRound - 1) * maxBytecodes + endBytecodes;
 
         double bytecodePercentage = (double) usedBytecodes / (double) maxBytecodes * 100.0;
-        if (bytecodePercentage > 95) {
+
+        if (startRound != endRound) {
+            uc.println(getLogPrefix(uc) + "Bytecode overflow: " + usedBytecodes + " (" + bytecodePercentage + "%)");
+        } else if (bytecodePercentage > 95) {
             uc.println(getLogPrefix(uc) + "High bytecode usage: " + usedBytecodes + " (" + bytecodePercentage + "%)");
         }
-
-        return bytecodePercentage < 100;
     }
 
     private String getLogPrefix(UnitController uc) {

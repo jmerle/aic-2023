@@ -77,7 +77,7 @@ public abstract class Unit {
             }
         }
 
-        if (sharedArray.getOpponentHQ() == null) {
+        if (!sharedArray.hasOpponentHQ()) {
             for (UnitInfo unit : uc.senseUnits(visionRange, opponentTeam)) {
                 if (unit.getType() == UnitType.HQ) {
                     sharedArray.setOpponentHQ(unit.getLocation());
@@ -176,7 +176,7 @@ public abstract class Unit {
     }
 
     protected boolean hasSymmetry() {
-        return sharedArray.hasMapSize() && sharedArray.getOpponentHQ() != null;
+        return sharedArray.hasMapSize() && sharedArray.hasOpponentHQ();
     }
 
     protected Symmetry getSymmetry() {

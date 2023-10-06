@@ -45,6 +45,10 @@ public class SharedArray {
         uc.write(INDEX_OPPONENT_HQ, locationToInt(location));
     }
 
+    public boolean hasOpponentHQ() {
+        return uc.read(INDEX_OPPONENT_HQ) != 0;
+    }
+
     public boolean hasMinX() {
         return uc.read(INDEX_HAS_MIN_X) == 1;
     }

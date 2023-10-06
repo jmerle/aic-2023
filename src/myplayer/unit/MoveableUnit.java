@@ -40,7 +40,7 @@ public abstract class MoveableUnit extends Unit {
         if (!sharedArray.hasMapSize()) {
             findBoundaries();
             return;
-        } else if (sharedArray.getOpponentHQ() == null && tryFindOpponentHQ()) {
+        } else if (!sharedArray.hasOpponentHQ() && tryFindOpponentHQ()) {
             return;
         }
 

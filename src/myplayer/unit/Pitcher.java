@@ -1,5 +1,6 @@
 package myplayer.unit;
 
+import aic2023.user.Direction;
 import aic2023.user.Location;
 import aic2023.user.MapObject;
 import aic2023.user.UnitController;
@@ -21,6 +22,10 @@ public class Pitcher extends MoveableUnit {
 
         MapObject currentObject = uc.senseObjectAtLocation(uc.getLocation(), true);
         if (currentObject == MapObject.BASE || currentObject == MapObject.STADIUM) {
+            if (uc.getLocation().distanceSquared(myHQ) <= 2 && isHQBlocked()) {
+                moveTo(myHQ);
+            }
+
             return;
         }
 
@@ -30,6 +35,22 @@ public class Pitcher extends MoveableUnit {
         } else {
             explore();
         }
+    }
+
+    private boolean isHQBlocked() {
+        for (Direction direction : adjacentDirections) {
+            Location location = myHQ.add(direction);
+            if (!uc.canSenseLocation(location) || uc.senseUnitAtLocation(location) != null) {
+                continue;
+            }
+
+            MapObject mapObject = uc.senseObjectAtLocation(location, true);
+            if (mapObject != MapObject.WATER && mapObject != MapObject.BALL) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private Location getClosestUnoccupiedObject() {

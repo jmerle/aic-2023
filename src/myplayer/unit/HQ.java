@@ -10,7 +10,6 @@ import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
 import myplayer.symmetry.Symmetry;
 import myplayer.util.BatScore;
-import myplayer.util.BatScorer;
 import myplayer.util.ExploredObject;
 
 import java.util.Arrays;
@@ -35,12 +34,8 @@ public class HQ extends Unit {
 
     private Direction[] recruitDirections = null;
 
-    private BatScorer batScorer;
-
     public HQ(UnitController uc) {
         super(uc, UnitType.HQ);
-
-        batScorer = new BatScorer(uc, sharedArray);
     }
 
     @Override

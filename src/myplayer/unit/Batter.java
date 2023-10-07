@@ -8,16 +8,11 @@ import aic2023.user.UnitInfo;
 import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
 import myplayer.util.BatScore;
-import myplayer.util.BatScorer;
 import myplayer.util.ExploredObject;
 
 public class Batter extends MoveableUnit {
-    private BatScorer scorer;
-
     public Batter(UnitController uc) {
         super(uc, UnitType.BATTER);
-
-        scorer = new BatScorer(uc, sharedArray);
     }
 
     @Override
@@ -60,7 +55,7 @@ public class Batter extends MoveableUnit {
                     continue;
                 }
 
-                BatScore score = scorer.getBatScore(batLocation, batDirection);
+                BatScore score = batScorer.getBatScore(batLocation, batDirection);
                 if (score == null) {
                     continue;
                 }

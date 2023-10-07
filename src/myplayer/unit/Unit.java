@@ -12,6 +12,7 @@ import myplayer.symmetry.HorizontalSymmetry;
 import myplayer.symmetry.RotationalSymmetry;
 import myplayer.symmetry.Symmetry;
 import myplayer.symmetry.VerticalSymmetry;
+import myplayer.util.BatScorer;
 import myplayer.util.ExploredTiles;
 import myplayer.util.MyRandom;
 import myplayer.util.SharedArray;
@@ -28,6 +29,7 @@ public abstract class Unit {
 
     protected SharedArray sharedArray;
     protected ExploredTiles exploredTiles;
+    protected BatScorer batScorer;
 
     protected Direction[] adjacentDirections = {
         Direction.NORTH,
@@ -58,6 +60,7 @@ public abstract class Unit {
         random = new MyRandom(uc);
 
         sharedArray = new SharedArray(uc);
+        batScorer = new BatScorer(uc, sharedArray);
     }
 
     public void run() {
@@ -75,6 +78,8 @@ public abstract class Unit {
                     }
                 }
             }
+
+            batScorer.myHQ = myHQ;
         }
 
         if (!sharedArray.hasOpponentHQ()) {

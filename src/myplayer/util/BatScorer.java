@@ -16,6 +16,8 @@ public class BatScorer {
     private Team myTeam;
     private Team opponentTeam;
 
+    public Location myHQ;
+
     public BatScorer(UnitController uc, SharedArray sharedArray) {
         this.uc = uc;
         this.sharedArray = sharedArray;
@@ -60,6 +62,8 @@ public class BatScorer {
             && !sharedArray.hasActed(batUnit.getID())
             && (batUnit.getCurrentMovementCooldown() < 1 || batUnit.getCurrentActionCooldown() < 1);
 
+        Location opponentHQ = sharedArray.getOpponentHQ();
+
         for (int i = 1; i <= 3; i++) {
             Location hitLocation = batLocation.add(batDirection.dx * i, batDirection.dy * i);
             boolean unitDestroyed = false;
@@ -87,6 +91,9 @@ public class BatScorer {
                         unitDestroyed = true;
                     }
                 }
+            } else if ((myHQ != null && hitLocation.isEqual(myHQ)) || (opponentHQ != null && hitLocation.isEqual(opponentHQ))) {
+                currentScore += batUnit.getTeam() == myTeam ? -2 : 2;
+                unitDestroyed = true;
             } else if (batUnit.getTeam() == myTeam) {
                 break;
             }
@@ -121,30 +128,38 @@ public class BatScorer {
 
         int currentScore = 0;
 
-        for (int i = 1; i <= 3; i++) {
-            Location hitLocation = batLocation.add(batDirection.dx * i, batDirection.dy * i);
-            if (!uc.canSenseLocation(hitLocation)) {
-                break;
-            }
+        Location opponentHQ = sharedArray.getOpponentHQ();
 
+        for (int i = 1; i <= 3; i++) {
             boolean ballDestroyed = false;
 
-            MapObject hitObject = uc.senseObjectAtLocation(hitLocation, true);
-            if (hitObject == MapObject.WATER || hitObject == MapObject.BALL) {
-                break;
-            }
-
-            UnitInfo hitUnit = uc.senseUnitAtLocation(hitLocation);
-            if (hitUnit != null) {
-                int multiplier = hitUnit.getTeam() == opponentTeam ? 1 : -1;
-                if (hitUnit.getType() == UnitType.HQ) {
-                    currentScore += 10 * multiplier;
-                    ballDestroyed = true;
-                } else if (hitUnit.getType() == UnitType.CATCHER) {
-                    ballDestroyed = true;
-                } else {
-                    currentScore += 2 * multiplier;
+            Location hitLocation = batLocation.add(batDirection.dx * i, batDirection.dy * i);
+            if (uc.canSenseLocation(hitLocation)) {
+                MapObject hitObject = uc.senseObjectAtLocation(hitLocation, true);
+                if (hitObject == MapObject.WATER || hitObject == MapObject.BALL) {
+                    break;
                 }
+
+                UnitInfo hitUnit = uc.senseUnitAtLocation(hitLocation);
+                if (hitUnit != null) {
+                    int multiplier = hitUnit.getTeam() == opponentTeam ? 1 : -1;
+                    if (hitUnit.getType() == UnitType.HQ) {
+                        currentScore += 10 * multiplier;
+                        ballDestroyed = true;
+                    } else if (hitUnit.getType() == UnitType.CATCHER) {
+                        ballDestroyed = true;
+                    } else {
+                        currentScore += 2 * multiplier;
+                    }
+                }
+            } else if (myHQ != null && hitLocation.isEqual(myHQ)) {
+                currentScore -= 10;
+                ballDestroyed = true;
+            } else if (opponentHQ != null && hitLocation.isEqual(opponentHQ)) {
+                currentScore += 10;
+                ballDestroyed = true;
+            } else {
+                break;
             }
 
             if (currentScore > maxScore || (currentScore == maxScore && currentScore > 0)) {

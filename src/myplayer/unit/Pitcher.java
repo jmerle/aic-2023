@@ -7,16 +7,11 @@ import aic2023.user.UnitController;
 import aic2023.user.UnitInfo;
 import aic2023.user.UnitType;
 import myplayer.util.BatScore;
-import myplayer.util.BatScorer;
 import myplayer.util.ExploredObject;
 
 public class Pitcher extends MoveableUnit {
-    private BatScorer batScorer;
-
     public Pitcher(UnitController uc) {
         super(uc, UnitType.PITCHER);
-
-        batScorer = new BatScorer(uc, sharedArray);
     }
 
     @Override
@@ -174,17 +169,6 @@ public class Pitcher extends MoveableUnit {
             uc.moveBall(bestBallDirection);
         }
     }
-
-    /*private void placeBall() {
-        Location myLocation = uc.getLocation();
-
-        for (Direction ballDirection : adjacentDirections) {
-            if (uc.canMoveBall(ballDirection) && isGoodBallLocation(myLocation.add(ballDirection))) {
-                uc.moveBall(ballDirection);
-                return;
-            }
-        }
-    }*/
 
     private boolean isGoodBallLocation(Location ballLocation) {
         for (Direction unitDirection : adjacentDirections) {

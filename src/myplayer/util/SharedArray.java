@@ -166,8 +166,9 @@ public class SharedArray {
         int count = uc.read(INDEX_EXPLORED_OBJECTS_COUNT);
         for (int i = 0; i < count; i++) {
             int baseIndex = INDEX_EXPLORED_OBJECTS_OFFSET + i * 4;
+            int occupation = uc.read(baseIndex + 2);
             int lastUpdate = uc.read(baseIndex + 3);
-            if (lastUpdate < thresholdRound) {
+            if (occupation == OCCUPATION_ME && lastUpdate < thresholdRound) {
                 uc.write(baseIndex + 2, OCCUPATION_EMPTY);
             }
         }

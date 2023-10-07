@@ -91,9 +91,10 @@ public class Batter extends MoveableUnit {
         int minDistance = Integer.MAX_VALUE;
 
         Location myLocation = uc.getLocation();
+        int currentRound = uc.getRound();
 
         for (ExploredObject object : sharedArray.getExploredObjects()) {
-            if (object.occupation != sharedArray.OCCUPATION_OPPONENT) {
+            if (object.occupation != sharedArray.OCCUPATION_OPPONENT && currentRound - object.lastUpdate < 100) {
                 continue;
             }
 

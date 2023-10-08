@@ -267,6 +267,9 @@ public class HQ extends Unit {
 
             for (Direction direction : recruitDirections) {
                 Location adjacentLocation = unitLocation.add(direction);
+                if (!uc.canSenseLocation(adjacentLocation)) {
+                    continue;
+                }
 
                 MapObject adjacentObject = uc.senseObjectAtLocation(adjacentLocation, true);
                 if (adjacentObject == MapObject.BALL) {

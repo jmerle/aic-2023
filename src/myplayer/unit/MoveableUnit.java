@@ -121,7 +121,15 @@ public abstract class MoveableUnit extends Unit {
         uc.drawLineDebug(myLocation, target, 255, 0, 0);
         sharedArray.setMoveTarget(target);
 
-        if (!uc.canMove() || myLocation.isEqual(target) || uc.getRound() % 2 == 1) {
+        boolean danger = false;
+        for (UnitInfo unit : uc.senseUnits(8, opponentTeam)) {
+            if (unit.getType() == UnitType.BATTER) {
+                danger = true;
+                break;
+            }
+        }
+
+        if (!uc.canMove() || myLocation.isEqual(target) || (!danger && uc.getRound() % 2 == 1)) {
             return;
         }
 

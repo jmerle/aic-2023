@@ -5,6 +5,7 @@ import aic2023.user.Location;
 import aic2023.user.MapObject;
 import aic2023.user.UnitController;
 import aic2023.user.UnitInfo;
+import aic2023.user.UnitStat;
 import aic2023.user.UnitType;
 import myplayer.util.BatScore;
 import myplayer.util.ExploredObject;
@@ -30,10 +31,31 @@ public class Pitcher extends MoveableUnit {
             return;
         }
 
-        MapObject currentObject = uc.senseObjectAtLocation(uc.getLocation(), true);
+        Location myLocation = uc.getLocation();
+        MapObject currentObject = uc.senseObjectAtLocation(myLocation, true);
         if (currentObject == MapObject.BASE || currentObject == MapObject.STADIUM) {
-            if (uc.getLocation().distanceSquared(myHQ) <= 2 && isHQBlocked()) {
+            if (myLocation.distanceSquared(myHQ) <= 2 && isHQBlocked()) {
                 moveTo(myHQ);
+            } else {
+                Location closestBatter = null;
+                int minDistance = Integer.MAX_VALUE;
+
+                for (UnitInfo unit : uc.senseUnits(me.getStat(UnitStat.VISION_RANGE), opponentTeam)) {
+                    if (unit.getType() != UnitType.BATTER) {
+                        continue;
+                    }
+
+                    int distance = unit.getLocation().distanceSquared(myLocation);
+                    if (distance < minDistance) {
+                        closestBatter = unit.getLocation();
+                        minDistance = distance;
+                    }
+                }
+
+                if (minDistance <= 8) {
+                    Direction awayDirection = myLocation.directionTo(closestBatter).opposite();
+                    moveTo(myLocation.add(awayDirection.dx * 100, awayDirection.dy * 100));
+                }
             }
 
             return;

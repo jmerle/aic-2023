@@ -38,7 +38,7 @@ public class Batter extends MoveableUnit {
         Direction bestMoveDirection = null;
         Direction bestBatDirection = null;
         int bestBatDistance = -1;
-        int maxScore = Integer.MIN_VALUE;
+        double maxScore = Double.MIN_VALUE;
 
         Location myLocation = uc.getLocation();
 

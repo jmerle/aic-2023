@@ -150,7 +150,7 @@ public class HQ extends Unit {
 
     private boolean tryRecruitBatter() {
         Direction bestDirection = null;
-        int maxScore = Integer.MIN_VALUE;
+        double maxScore = Double.MIN_VALUE;
 
         for (Direction batterDirection : recruitDirections) {
             if (!uc.canRecruitUnit(UnitType.BATTER, batterDirection)) {
@@ -234,7 +234,7 @@ public class HQ extends Unit {
         }
 
         Direction bestDirection = null;
-        int maxScore = Integer.MIN_VALUE;
+        double maxScore = Double.MIN_VALUE;
 
         for (Direction ballDirection : recruitDirections) {
             if (!uc.canConstructBall(ballDirection)) {

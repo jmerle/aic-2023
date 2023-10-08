@@ -97,7 +97,7 @@ public class Pitcher extends MoveableUnit {
 
     private void placeBall() {
         Direction bestBallDirection = null;
-        int maxScore = 0;
+        double maxScore = 0;
 
         Location myLocation = uc.getLocation();
 

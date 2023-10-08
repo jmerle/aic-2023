@@ -41,10 +41,10 @@ public class BatScorer {
     }
 
     public BatScore getBatScoreUnit(Location batLocation, Direction batDirection) {
-        int maxScore = 0;
+        double maxScore = 0;
         int bestDistance = 0;
 
-        int currentScore = 0;
+        double currentScore = 0;
 
         UnitInfo batUnit = uc.senseUnitAtLocation(batLocation);
         if (batUnit.getTeam() == opponentTeam) {
@@ -98,10 +98,15 @@ public class BatScorer {
                 break;
             }
 
-            int finalScore = currentScore;
+            double finalScore = currentScore;
             if (useMoveTarget && !unitDestroyed) {
-                if (hitLocation.distanceSquared(moveTarget) < initialMoveTargetDistance) {
-                    finalScore++;
+                int newDistance = hitLocation.distanceSquared(moveTarget);
+                if (newDistance < initialMoveTargetDistance) {
+                    if (newDistance == 0) {
+                        finalScore++;
+                    } else {
+                        finalScore += 1.0 / (double) newDistance;
+                    }
                 }
             }
 
@@ -123,10 +128,10 @@ public class BatScorer {
     }
 
     public BatScore getBatScoreBall(Location batLocation, Direction batDirection) {
-        int maxScore = 0;
+        double maxScore = 0;
         int bestDistance = 0;
 
-        int currentScore = 0;
+        double currentScore = 0;
 
         Location opponentHQ = sharedArray.getOpponentHQ();
 

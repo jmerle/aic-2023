@@ -1,10 +1,10 @@
 package myplayer.util;
 
 public class BatScore {
-    public int score;
+    public double score;
     public int distance;
 
-    public BatScore(int score, int distance) {
+    public BatScore(double score, int distance) {
         this.score = score;
         this.distance = distance;
     }

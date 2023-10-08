@@ -24,6 +24,8 @@ public class SharedArray {
     public int INDEX_UNEXPLORED_OFFSET = allocate(GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE);
     private int INDEX_MOVE_TARGET_OFFSET = allocate(GameConstants.MAX_ID);
     private int INDEX_LAST_ROUND_OFFSET = allocate(GameConstants.MAX_ID);
+    private int INDEX_REGISTERED_UNITS_COUNT = allocate(1);
+    private int INDEX_REGISTERED_UNITS_OFFSET = allocate(GameConstants.MAX_MAP_SIZE * GameConstants.MAX_MAP_SIZE * 2);
 
     private MapObject[] MAP_OBJECTS = MapObject.values();
 
@@ -220,6 +222,35 @@ public class SharedArray {
 
     public void updateLastRound() {
         uc.write(INDEX_LAST_ROUND_OFFSET + uc.getInfo().getID() - 1, uc.getRound());
+    }
+
+    public RegisteredUnit[] getRegisteredUnits() {
+        int count = uc.read(INDEX_REGISTERED_UNITS_COUNT);
+
+        RegisteredUnit[] units = new RegisteredUnit[count];
+        for (int i = 0; i < count; i++) {
+            int baseIndex = INDEX_REGISTERED_UNITS_OFFSET + i * 2;
+            int id = uc.read(baseIndex);
+            Location location = intToLocation(uc.read(baseIndex + 1));
+
+            units[i] = new RegisteredUnit(id, location);
+        }
+
+        return units;
+    }
+
+    public void registerUnit() {
+        int count = uc.read(INDEX_REGISTERED_UNITS_COUNT);
+
+        int baseIndex = INDEX_REGISTERED_UNITS_OFFSET + count * 2;
+        uc.write(baseIndex, uc.getInfo().getID());
+        uc.write(baseIndex + 1, locationToInt(uc.getLocation()));
+
+        uc.write(INDEX_REGISTERED_UNITS_COUNT, count + 1);
+    }
+
+    public void clearRegisteredUnits() {
+        uc.write(INDEX_REGISTERED_UNITS_COUNT, 0);
     }
 
     private int locationToInt(Location location) {

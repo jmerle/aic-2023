@@ -11,6 +11,7 @@ import aic2023.user.UnitType;
 import myplayer.symmetry.Symmetry;
 import myplayer.util.BatScore;
 import myplayer.util.ExploredObject;
+import myplayer.util.RegisteredUnit;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -116,6 +117,23 @@ public class HQ extends Unit {
                 didSomething = true;
             }
         }
+
+        if (uc.getEnergyLeft() > 5000) {
+            RegisteredUnit[] units = sharedArray.getRegisteredUnits();
+            for (RegisteredUnit unit : units) {
+                unit.value = -myHQ.distanceSquared(unit.location);
+            }
+
+            sortRegisteredUnits(units, 0, units.length - 1);
+
+            for (RegisteredUnit unit : units) {
+                if (uc.canSchedule(unit.id)) {
+                    uc.schedule(unit.id);
+                }
+            }
+        }
+
+        sharedArray.clearRegisteredUnits();
     }
 
     private boolean tryRecruit(UnitType type) {
@@ -300,5 +318,42 @@ public class HQ extends Unit {
         }
 
         return didSomething;
+    }
+
+    private void sortRegisteredUnits(RegisteredUnit[] units, int low, int high) {
+        if (units.length < 2) {
+            return;
+        }
+
+        int i = low;
+        int j = high;
+
+        int pivot = units[(low + high) / 2].value;
+
+        while (i <= j) {
+            while (units[i].value < pivot) {
+                i++;
+            }
+
+            while (units[j].value > pivot) {
+                j--;
+            }
+
+            if (i <= j) {
+                RegisteredUnit tmp = units[i];
+                units[i] = units[j];
+                units[j] = tmp;
+                i++;
+                j--;
+            }
+        }
+
+        if (low < j) {
+            sortRegisteredUnits(units, low, j);
+        }
+
+        if (i < high) {
+            sortRegisteredUnits(units, i, high);
+        }
     }
 }

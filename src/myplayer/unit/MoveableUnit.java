@@ -34,6 +34,8 @@ public abstract class MoveableUnit extends Unit {
     @Override
     public void run() {
         super.run();
+
+        sharedArray.registerUnit();
     }
 
     protected void explore() {
@@ -119,7 +121,7 @@ public abstract class MoveableUnit extends Unit {
         uc.drawLineDebug(myLocation, target, 255, 0, 0);
         sharedArray.setMoveTarget(target);
 
-        if (!uc.canMove() || myLocation.isEqual(target)) {
+        if (!uc.canMove() || myLocation.isEqual(target) || uc.getRound() % 2 == 1) {
             return;
         }
 

@@ -11,7 +11,9 @@ import myplayer.symmetry.RotationalSymmetry;
 import myplayer.symmetry.VerticalSymmetry;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public abstract class MoveableUnit extends Unit {
     private Location currentTarget;
@@ -19,6 +21,7 @@ public abstract class MoveableUnit extends Unit {
     private int distanceBeforeWallFollowing;
     private boolean wallOnRight;
     private Location lastFollowedWall;
+    private Set<Integer> visited;
 
     private Direction previousDirection = Direction.ZERO;
 
@@ -140,6 +143,14 @@ public abstract class MoveableUnit extends Unit {
 
         updateCanMove();
 
+        if (isWallFollowing) {
+            Direction direction = uc.getLocation().directionTo(lastFollowedWall);
+            int code = ((((myLocation.x << 15) | myLocation.y) << 4) | direction.ordinal() << 1) | (wallOnRight ? 1 : 0);
+            if (!visited.add(code)) {
+                isWallFollowing = false;
+            }
+        }
+
         int currentDistance = myLocation.distanceSquared(target);
         if (isWallFollowing && currentDistance <= distanceBeforeWallFollowing) {
             isWallFollowing = false;
@@ -153,6 +164,7 @@ public abstract class MoveableUnit extends Unit {
             } else {
                 isWallFollowing = true;
                 distanceBeforeWallFollowing = currentDistance;
+                visited = new HashSet<>();
                 setInitialWallFollowingDirection();
             }
         }
